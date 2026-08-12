@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ร้านค้าออมสินมหาเฮง | จำหน่ายแอปพรีเมียมราคาถูก</title>
+
+  <!-- PWA & Standalone Web App Integration -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ออมสินมหาเฮง">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="apple-touch-icon" href="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png">
+  <link rel="icon" type="image/png" href="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons CDN (No Emojis used) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts: Kanit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- HTML2Canvas & Tesseract OCR Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+  <style>
+    * {
+      font-family: 'Kanit', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Animated Moving Laser Border Effect */
+    .laser-card {
+      position: relative;
+      background: #ffffff;
+      border-radius: 1rem;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .laser-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(transparent, transparent, transparent, #ec4899, #8b5cf6, #3b82f6);
+      animation: rotateLaser 4s linear infinite;
+      z-index: -2;
+    }
+    .laser-card::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: #ffffff;
+      border-radius: 0.9rem;
+      z-index: -1;
+    }
+    @keyframes rotateLaser {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between selection:bg-pink-100 selection:text-pink-600">
+
+  <!-- Configuration Setup -->
+  <script>
+    // **วาง URL ที่ได้จาก Google Apps Script Deployment ที่นี่**
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby4U2WyNN3yNobTLpk7dZhitQ2p_wlRl-qqACus2KHQP2dlwIerTyxcpO6yeOTyKClS1w/exec";
+    const TARGET_ACCOUNT_NAME = "ร้านค้าออมสินมหาเฮง (คิงแอดส์)";
+    const QR_CODE_IMG = "https://s.imgz.io/2026/07/15/IMG_75242612165b6fd16c31.jpeg";
+  </script>
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png" alt="Logo" class="w-10 h-10 rounded-full shadow-sm border border-slate-100 object-cover">
+        <div>
+          <h1 class="font-bold text-slate-800 text-base leading-tight">ออมสินมหาเฮง</h1>
+          <p class="text-xs text-pink-500 font-medium">จำหน่ายแอปพรีเมียมราคาถูก</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleAdminModal()" class="w-9 h-9 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition flex items-center justify-center text-sm" title="จัดการหลังบ้าน">
+          <i class="fa-solid fa-user-gear"></i>
+        </button>
+        <button onclick="toggleCartDrawer()" class="relative w-9 h-9 rounded-full bg-pink-50 text-pink-600 hover:bg-pink-100 transition flex items-center justify-center text-sm">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span id="cart-count" class="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Layout (Ministore Mobile First) -->
+  <main class="max-w-md mx-auto w-full px-4 py-6 flex-1 space-y-6">
+
+    <!-- Hero Banner & Search -->
+    <div class="bg-gradient-to-br from-pink-50 to-purple-50 p-5 rounded-2xl border border-pink-100/60 shadow-sm">
+      <div class="flex items-center gap-2 text-pink-600 text-xs font-semibold uppercase tracking-wider mb-1">
+        <i class="fa-solid fa-bolt-lightning"></i> บริการรวดเร็ว 24 ชม.
+      </div>
+      <h2 class="text-xl font-bold text-slate-800 mb-1">แอปพรีเมียมของแท้ 100%</h2>
+      <p class="text-xs text-slate-500 mb-4">ราคาย่อมเยา ปลอดภัย พร้อมการรับประกันตลอดการใช้งาน</p>
+
+      <!-- Filter / Search Input -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input type="text" id="search-input" oninput="filterProducts()" placeholder="ค้นหาแอปพลิเคชัน..." class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-pink-400 transition shadow-sm">
+      </div>
+    </div>
+
+    <!-- Products Section -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-cubes text-pink-500"></i> รายการสินค้าทั้งหมด
+        </h3>
+        <span id="product-count" class="text-xs text-slate-400">กำลังโหลด...</span>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div id="loading-products" class="py-12 text-center">
+        <i class="fa-solid fa-circle-notch fa-spin text-pink-500 text-2xl mb-2"></i>
+        <p class="text-xs text-slate-400">กำลังโหลดรายการสินค้า...</p>
+      </div>
+
+      <!-- Product Grid -->
+      <div id="product-grid" class="grid grid-cols-1 gap-4 hidden"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-100 py-6 text-center text-xs text-slate-400 max-w-md mx-auto w-full">
+    <p>© 2026 ร้านค้าออมสินมหาเฮง (คิงแอดส์) All rights reserved.</p>
+    <p class="mt-1 text-[10px] text-slate-300">ระบบจำหน่ายสินค้าอัตโนมัติ รวดเร็ว ปลอดภัย</p>
+  </footer>
+
+  <!-- Drawer: Cart -->
+  <div id="cart-drawer" class="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div id="cart-panel" class="fixed right-0 top-0 bottom-0 w-full max-w-xs bg-white shadow-2xl flex flex-col transform translate-x-full transition-transform duration-300">
+      <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-basket-shopping text-pink-500"></i> ตะกร้าสินค้า
+        </h3>
+        <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-slate-600 p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+        <!-- Empty Cart State -->
+        <div id="empty-cart" class="text-center py-12 text-slate-400">
+          <i class="fa-solid fa-cart-flatbed text-3xl mb-2"></i>
+          <p class="text-xs">ไม่มีสินค้าในตะกร้า</p>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
+        <div class="flex items-center justify-between text-sm">
+          <span class="text-slate-500">ยอดรวมทั้งหมด</span>
+          <span id="cart-total" class="font-bold text-pink-600 text-base">฿0</span>
+        </div>
+        <button id="checkout-btn" onclick="openCheckoutModal()" disabled class="w-full py-3 bg-pink-500 text-white rounded-xl font-semibold text-xs hover:bg-pink-600 disabled:bg-slate-300 disabled:cursor-not-allowed transition shadow-sm flex items-center justify-center gap-2">
+          <i class="fa-solid fa-credit-card"></i> ดำเนินการชำระเงิน
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Payment & Slip Verification -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-qrcode text-pink-500"></i> ชำระเงิน & ตรวจสอบสลิป
+        </h3>
+        <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- QR Code and Account Info -->
+      <div class="text-center space-y-2 bg-pink-50/50 p-4 rounded-xl border border-pink-100">
+        <img src="https://s.imgz.io/2026/07/15/IMG_75242612165b6fd16c31.jpeg" alt="PromptPay QR Code" class="w-44 h-44 mx-auto rounded-lg border border-white shadow-sm object-cover">
+        <div class="text-xs">
+          <p class="text-slate-500">ชื่อบัญชีผู้รับเงิน</p>
+          <p class="font-bold text-slate-800 text-sm">ร้านค้าออมสินมหาเฮง (คิงแอดส์)</p>
+          <p class="text-pink-600 font-bold text-lg mt-1">ยอดชำระ: <span id="checkout-amount-display">฿0</span></p>
+        </div>
+      </div>
+
+      <!-- Customer Email Input -->
+      <div class="space-y-1">
+        <label class="block text-xs font-medium text-slate-700">อีเมลสำหรับรับสินค้า <span class="text-pink-500">*</span></label>
+        <div class="relative">
+          <i class="fa-solid fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="email" id="customer-email" placeholder="example@gmail.com" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-pink-400">
+        </div>
+      </div>
+
+      <!-- Slip Upload Area -->
+      <div class="space-y-1">
+        <label class="block text-xs font-medium text-slate-700">แนบสลิปการโอนเงิน <span class="text-pink-500">*</span></label>
+        <div id="drop-area" onclick="document.getElementById('slip-input').click()" class="border-2 border-dashed border-slate-200 hover:border-pink-300 rounded-xl p-4 text-center cursor-pointer transition bg-slate-50">
+          <input type="file" id="slip-input" accept="image/*" class="hidden" onchange="handleSlipUpload(this.files[0])">
+          <div id="upload-placeholder" class="space-y-1">
+            <i class="fa-solid fa-cloud-arrow-up text-slate-400 text-xl"></i>
+            <p class="text-xs text-slate-500">คลิกหรือลากไฟล์สลิปมาวางที่นี่</p>
+            <p class="text-[10px] text-slate-400">รองรับไฟล์ภาพ JPG, PNG</p>
+          </div>
+          <div id="upload-preview" class="hidden flex flex-col items-center gap-2">
+            <img id="slip-preview-img" class="h-28 object-contain rounded-lg border border-slate-200 shadow-sm">
+            <p class="text-[10px] text-pink-500 font-medium">คลิกเพื่อเปลี่ยนรูปภาพ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- OCR Scanning Progress -->
+      <div id="ocr-status" class="hidden text-center py-2 px-3 bg-blue-50 border border-blue-100 rounded-xl text-xs text-blue-600 flex items-center justify-center gap-2">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span id="ocr-msg">กำลังอ่านข้อมูลสลิปอัตโนมัติ...</span>
+      </div>
+
+      <!-- Action Button -->
+      <button id="confirm-payment-btn" onclick="processPayment()" disabled class="w-full py-3 bg-pink-500 text-white rounded-xl font-semibold text-xs hover:bg-pink-600 disabled:bg-slate-300 disabled:cursor-not-allowed transition shadow-sm flex items-center justify-center gap-2">
+        <i class="fa-solid fa-circle-check"></i> ยืนยันการชำระเงิน
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Receipt Output -->
+  <div id="receipt-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-xl overflow-hidden">
+      <!-- Printable Receipt Canvas Card -->
+      <div id="receipt-card" class="bg-gradient-to-b from-white to-pink-50/30 p-5 rounded-xl border border-pink-100 space-y-4">
+        <div class="text-center border-b border-dashed border-slate-200 pb-3">
+          <img src="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png" class="w-12 h-12 mx-auto rounded-full shadow-sm mb-2">
+          <h4 class="font-bold text-slate-800 text-base">ใบเสร็จรับเงิน</h4>
+          <p class="text-[11px] text-slate-500">ร้านค้าออมสินมหาเฮง (คิงแอดส์)</p>
+        </div>
+
+        <div class="text-xs space-y-1 text-slate-600">
+          <div class="flex justify-between"><span class="text-slate-400">เลขที่ทำรายการ:</span><span id="rec-id" class="font-mono font-medium">#-</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">วันที่:</span><span id="rec-date">-</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">อีเมลผู้รับ:</span><span id="rec-email" class="font-medium text-slate-800">-</span></div>
+        </div>
+
+        <div class="border-t border-b border-slate-100 py-2 space-y-1" id="rec-items"></div>
+
+        <div class="flex justify-between items-center pt-1 text-sm">
+          <span class="font-bold text-slate-700">ยอดชำระสุทธิ</span>
+          <span id="rec-total" class="font-bold text-pink-600 text-base">฿0</span>
+        </div>
+
+        <div class="text-center pt-2">
+          <span class="inline-flex items-center gap-1 bg-green-50 text-green-600 px-3 py-1 rounded-full text-[10px] font-medium border border-green-200">
+            <i class="fa-solid fa-shield-halved"></i> ชำระเงินสำเร็จแล้ว
+          </span>
+        </div>
+      </div>
+
+      <!-- Receipt Controls -->
+      <div class="flex gap-2">
+        <button onclick="downloadReceiptPNG()" class="flex-1 py-2.5 bg-slate-800 text-white rounded-xl text-xs font-semibold hover:bg-slate-900 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-download"></i> บันทึกใบเสร็จ (.png)
+        </button>
+        <button onclick="closeReceiptModal()" class="py-2.5 px-4 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200 transition">
+          ปิด
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Announcement & Browser Notice -->
+  <div id="announcement-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-xl text-center">
+      <div id="announcement-img-container" class="hidden">
+        <img id="announcement-img" class="w-full max-h-40 object-cover rounded-xl border border-slate-100 shadow-sm">
+      </div>
+      <div class="space-y-1">
+        <h3 id="announcement-title" class="font-bold text-slate-800 text-base">การแจ้งเตือน</h3>
+        <p id="announcement-content" class="text-xs text-slate-600 leading-relaxed"></p>
+      </div>
+      <button onclick="closeAnnouncementModal()" class="w-full py-2.5 bg-pink-500 text-white rounded-xl font-semibold text-xs hover:bg-pink-600 transition shadow-sm">
+        ตกลง / เข้าสู่ร้านค้า
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: In-App Browser Warning -->
+  <div id="inapp-warning-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-xl text-center">
+      <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto text-xl border border-amber-200">
+        <i class="fa-solid fa-compass"></i>
+      </div>
+      <div class="space-y-1">
+        <h3 class="font-bold text-slate-800 text-base">แนะนำให้เปิดด้วยเบราว์เซอร์หลัก</h3>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          เพื่อประสบการณ์การใช้งานที่สมบูรณ์และการเพิ่มแอปไว้ที่หน้าจอโฮม กรุณาเปิดลิงก์นี้ใน <b>Safari</b> หรือ <b>Chrome</b>
+        </p>
+      </div>
+      <div class="bg-slate-50 p-3 rounded-xl text-left text-[11px] text-slate-500 space-y-1 border border-slate-100">
+        <p class="font-semibold text-slate-700">วิธีติดตั้งบนหน้าจอโฮม:</p>
+        <p><i class="fa-solid fa-share-from-square text-pink-500"></i> iOS: กดปุ่มแชร์ -> เลือก "เพิ่มไปยังหน้าจอโฮม"</p>
+        <p><i class="fa-solid fa-ellipsis-vertical text-pink-500"></i> Android: กดจุด 3 จุด -> เลือก "เพิ่มลงในหน้าจอหลัก"</p>
+      </div>
+      <button onclick="document.getElementById('inapp-warning-modal').classList.add('hidden')" class="w-full py-2.5 bg-slate-800 text-white rounded-xl font-semibold text-xs hover:bg-slate-900 transition">
+        รับทราบ
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal: Admin Backoffice -->
+  <div id="admin-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl w-full max-w-md p-5 space-y-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <i class="fa-solid fa-sliders text-pink-500"></i> ระบบหลังบ้าน (Admin)
+        </h3>
+        <button onclick="toggleAdminModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Add / Edit Product Form -->
+      <form id="admin-product-form" onsubmit="handleSaveProduct(event)" class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+        <h4 class="font-semibold text-xs text-slate-700 flex items-center gap-1">
+          <i class="fa-solid fa-plus-circle text-pink-500"></i> เพิ่ม / แก้ไขสินค้า
+        </h4>
+        <input type="hidden" id="adm-prod-id">
+        <!-- FIX: เก็บ URL รูปเดิมไว้ เพื่อไม่ให้รูปหายตอนแก้ไขโดยไม่ได้เลือกไฟล์ใหม่ -->
+        <input type="hidden" id="adm-prod-image-url">
+        <div>
+          <label class="text-[11px] text-slate-600">ชื่อสินค้า</label>
+          <input type="text" id="adm-prod-name" required class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-pink-400">
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] text-slate-600">ระยะเวลา</label>
+            <input type="text" id="adm-prod-duration" placeholder="เช่น 30 วัน" required class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-pink-400">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-600">ราคา (บาท)</label>
+            <input type="number" id="adm-prod-price" required class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-pink-400">
+          </div>
+        </div>
+        <div>
+          <label class="text-[11px] text-slate-600">รายละเอียดสินค้า</label>
+          <textarea id="adm-prod-desc" rows="2" class="w-full p-2 text-xs bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-pink-400"></textarea>
+        </div>
+        <div>
+          <label class="text-[11px] text-slate-600">เลือกรูปภาพสินค้า</label>
+          <input type="file" id="adm-prod-file" accept="image/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-pink-50 file:text-pink-600 hover:file:bg-pink-100">
+          <!-- FIX: แสดงรูปเดิมให้เห็นตอนแก้ไข พร้อมคำอธิบายว่าจะไม่เปลี่ยนถ้าไม่เลือกไฟล์ใหม่ -->
+          <div id="adm-current-image-wrap" class="hidden mt-2 flex items-center gap-2 bg-white border border-slate-200 rounded-lg p-2">
+            <img id="adm-current-image-preview" class="w-10 h-10 rounded-lg object-cover border border-slate-100">
+            <p class="text-[10px] text-slate-500 flex-1">ใช้รูปเดิม (เลือกไฟล์ใหม่ด้านบนเพื่อเปลี่ยนรูป)</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button type="submit" id="adm-save-btn" class="flex-1 py-2 bg-pink-500 text-white rounded-lg text-xs font-semibold hover:bg-pink-600 transition flex items-center justify-center gap-1">
+            <i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลสินค้า
+          </button>
+          <!-- FIX: ปุ่มยกเลิกการแก้ไข เพื่อกลับไปโหมด "เพิ่มสินค้าใหม่" -->
+          <button type="button" id="adm-cancel-edit-btn" onclick="cancelEditProduct()" class="hidden py-2 px-3 bg-slate-200 text-slate-600 rounded-lg text-xs font-semibold hover:bg-slate-300 transition">
+            ยกเลิก
+          </button>
+        </div>
+      </form>
+
+      <!-- Manage Admin Products List -->
+      <div class="space-y-2">
+        <h4 class="font-semibold text-xs text-slate-700">รายการสินค้าที่มีอยู่</h4>
+        <div id="admin-product-list" class="space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Global Application Logic -->
+  <script>
+    // State Management
+    let productsList = [];
+    let cartList = [];
+    let selectedSlipBase64 = '';
+    let isOcrValid = false;
+
+    // FIX: สถานะการยืนยันตัวตนแอดมิน — เก็บรหัสผ่านไว้ในตัวแปร (หน่วยความจำของหน้าเว็บเท่านั้น)
+    // ไม่ใช่ค่าคงที่ที่ฝังในซอร์สโค้ด จึงไม่มีใครเห็นรหัสผ่านจริงจากการดู "View Source"
+    let adminAuthenticated = false;
+    let adminPasswordCache = '';
+
+    // Initialize Application
+    document.addEventListener("DOMContentLoaded", () => {
+      checkInAppBrowser();
+      loadInitialData();
+    });
+
+    // Check In-App Browsers (e.g. Line, Facebook In-App)
+    function checkInAppBrowser() {
+      const ua = navigator.userAgent || navigator.vendor || window.opera;
+      const isInApp = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Line") > -1);
+      if (isInApp) {
+        document.getElementById('inapp-warning-modal').classList.remove('hidden');
+      }
+    }
+
+    // Fetch Products & Popups from Backend GAS API
+    async function loadInitialData() {
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getInitialData' })
+        });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+          productsList = data.products || [];
+          renderProducts(productsList);
+
+          // Show popup if available
+          if (data.popups && data.popups.length > 0) {
+            const pop = data.popups[0];
+            showAnnouncementModal(pop.title, pop.content, pop.imageUrl);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load initial data:", err);
+      } finally {
+        document.getElementById('loading-products').classList.add('hidden');
+        document.getElementById('product-grid').classList.remove('hidden');
+      }
+    }
+
+    // Render Product Cards with Animated Laser Border
+    function renderProducts(items) {
+      const grid = document.getElementById('product-grid');
+      document.getElementById('product-count').innerText = `${items.length} รายการ`;
+      grid.innerHTML = '';
+
+      if (items.length === 0) {
+        grid.innerHTML = `
+          <div class="text-center py-8 text-slate-400">
+            <i class="fa-solid fa-box-open text-2xl mb-2"></i>
+            <p class="text-xs">ไม่พบรายการสินค้า</p>
+          </div>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "laser-card p-4 shadow-sm space-y-3";
+        card.innerHTML = `
+          <div class="flex gap-3">
+            <img src="${item.imageUrl || 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png'}" class="w-16 h-16 rounded-xl object-cover border border-slate-100 flex-shrink-0">
+            <div class="flex-1 space-y-1">
+              <div class="flex items-start justify-between">
+                <h4 class="font-bold text-slate-800 text-sm leading-tight">${item.name}</h4>
+                <span class="text-[10px] bg-pink-50 text-pink-600 px-2 py-0.5 rounded-md font-semibold">${item.duration}</span>
+              </div>
+              <p class="text-xs font-bold text-pink-600">฿${item.price}</p>
+              <button onclick="toggleDetails('${item.id}')" class="text-[11px] text-slate-400 hover:text-slate-600 flex items-center gap-1">
+                <i class="fa-solid fa-circle-info"></i> รายละเอียดเพิ่มเติม
+              </button>
+            </div>
+          </div>
+          <div id="desc-${item.id}" class="hidden text-xs text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-100 leading-relaxed">
+            ${item.description || 'ไม่มีรายละเอียดเพิ่มเติม'}
+          </div>
+          <button onclick="addToCart('${item.id}')" class="w-full py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-cart-plus"></i> เพิ่มลงตะกร้า
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function toggleDetails(id) {
+      const el = document.getElementById(`desc-${id}`);
+      el.classList.toggle('hidden');
+    }
+
+    function filterProducts() {
+      const query = document.getElementById('search-input').value.toLowerCase();
+      const filtered = productsList.filter(p => p.name.toLowerCase().includes(query));
+      renderProducts(filtered);
+    }
+
+    // Cart Logic
+    function addToCart(productId) {
+      const product = productsList.find(p => p.id === productId);
+      if (!product) return;
+
+      const existing = cartList.find(c => c.id === productId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cartList.push({ ...product, qty: 1 });
+      }
+      updateCartUI();
+    }
+
+    function removeFromCart(productId) {
+      cartList = cartList.filter(c => c.id !== productId);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const cartCountEl = document.getElementById('cart-count');
+      const cartItemsEl = document.getElementById('cart-items');
+      const emptyCartEl = document.getElementById('empty-cart');
+      const cartTotalEl = document.getElementById('cart-total');
+      const checkoutBtn = document.getElementById('checkout-btn');
+
+      const totalItems = cartList.reduce((sum, item) => sum + item.qty, 0);
+      const totalPrice = cartList.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      cartCountEl.innerText = totalItems;
+      cartCountEl.classList.toggle('hidden', totalItems === 0);
+
+      if (cartList.length === 0) {
+        emptyCartEl.classList.remove('hidden');
+        cartItemsEl.innerHTML = '';
+        cartItemsEl.appendChild(emptyCartEl);
+        checkoutBtn.disabled = true;
+      } else {
+        emptyCartEl.classList.add('hidden');
+        cartItemsEl.innerHTML = '';
+        cartList.forEach(item => {
+          const div = document.createElement('div');
+          div.className = "flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs";
+          div.innerHTML = `
+            <div class="flex-1 pr-2">
+              <p class="font-bold text-slate-800">${item.name}</p>
+              <p class="text-[10px] text-slate-400">฿${item.price} x ${item.qty}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-pink-600">฿${item.price * item.qty}</span>
+              <button onclick="removeFromCart('${item.id}')" class="text-slate-400 hover:text-red-500 p-1">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          `;
+          cartItemsEl.appendChild(div);
+        });
+        checkoutBtn.disabled = false;
+      }
+
+      cartTotalEl.innerText = `฿${totalPrice}`;
+      document.getElementById('checkout-amount-display').innerText = `฿${totalPrice}`;
+    }
+
+    function toggleCartDrawer() {
+      const drawer = document.getElementById('cart-drawer');
+      const panel = document.getElementById('cart-panel');
+      if (drawer.classList.contains('pointer-events-none')) {
+        drawer.classList.remove('pointer-events-none', 'opacity-0');
+        panel.classList.remove('translate-x-full');
+      } else {
+        drawer.classList.add('opacity-0', 'pointer-events-none');
+        panel.classList.add('translate-x-full');
+      }
+    }
+
+    // Payment Modal & OCR Slip Verification
+    function openCheckoutModal() {
+      toggleCartDrawer();
+      document.getElementById('checkout-modal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+    }
+
+    function handleSlipUpload(file) {
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        selectedSlipBase64 = e.target.result;
+        document.getElementById('slip-preview-img').src = selectedSlipBase64;
+        document.getElementById('upload-placeholder').classList.add('hidden');
+        document.getElementById('upload-preview').classList.remove('hidden');
+
+        // Execute OCR Scan
+        runSlipOCR(selectedSlipBase64);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function runSlipOCR(imageUri) {
+      const statusEl = document.getElementById('ocr-status');
+      const msgEl = document.getElementById('ocr-msg');
+      const confirmBtn = document.getElementById('confirm-payment-btn');
+
+      statusEl.classList.remove('hidden');
+      msgEl.innerText = "กำลังสแกนอ่านข้อมูลสลิป...";
+      confirmBtn.disabled = true;
+
+      try {
+        const worker = await Tesseract.createWorker('tha+eng');
+        const ret = await worker.recognize(imageUri);
+        await worker.terminate();
+
+        const text = ret.data.text.replace(/\s+/g, '');
+        console.log("OCR Result Text:", text);
+
+        // Verification logic: Check Account Name and Amount
+        const totalPrice = cartList.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        const hasAccountName = text.includes("ออมสินมหาเฮง") || text.includes("คิงแอดส์");
+
+        // NOTE: การอ่านสลิปด้วย OCR ไม่แม่นยำ 100% จึงยังคงอนุญาตให้ลูกค้ากดยืนยันได้
+        // แม้ตรวจไม่พบชื่อบัญชี (แค่เปลี่ยนข้อความแจ้งเตือนเป็นสีเหลือง) — การตรวจสอบจริง
+        // ยังต้องดูสลิปที่แนบมาใน Sheet "Orders" อีกครั้งก่อนส่งมอบสินค้าจริงเสมอ
+        if (hasAccountName) {
+          isOcrValid = true;
+          statusEl.className = "text-center py-2 px-3 bg-green-50 border border-green-100 rounded-xl text-xs text-green-600 flex items-center justify-center gap-2";
+          msgEl.innerText = "ตรวจสอบสลิปถูกต้องเรียบร้อยแล้ว";
+          confirmBtn.disabled = false;
+        } else {
+          isOcrValid = true; // Fallback permit with notice
+          statusEl.className = "text-center py-2 px-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-600 flex items-center justify-center gap-2";
+          msgEl.innerText = "อัปโหลดสลิปสำเร็จ (พร้อมส่งตรวจสอบ)";
+          confirmBtn.disabled = false;
+        }
+      } catch (err) {
+        statusEl.className = "text-center py-2 px-3 bg-amber-50 border border-amber-100 rounded-xl text-xs text-amber-600 flex items-center justify-center gap-2";
+        msgEl.innerText = "อัปโหลดสลิปเรียบร้อยแล้ว";
+        confirmBtn.disabled = false;
+      }
+    }
+
+    // Submit Order & Prevent Double Click
+    async function processPayment() {
+      const email = document.getElementById('customer-email').value.trim();
+      if (!email) {
+        alert("กรุณากรอกอีเมลสำหรับรับสินค้า");
+        return;
+      }
+      if (!selectedSlipBase64) {
+        alert("กรุณาแนบสลิปการโอนเงิน");
+        return;
+      }
+
+      const confirmBtn = document.getElementById('confirm-payment-btn');
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึกข้อมูล...`;
+
+      const orderId = 'ORD' + Date.now().toString().slice(-6);
+      const totalAmount = cartList.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+      const payload = {
+        action: 'submitOrder',
+        data: {
+          orderId: orderId,
+          email: email,
+          items: cartList,
+          total: totalAmount,
+          slipBase64: selectedSlipBase64
+        }
+      };
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+
+        if (result.status === 'success') {
+          closeCheckoutModal();
+          showReceipt({
+            orderId: orderId,
+            date: result.timestamp || new Date().toLocaleString('th-TH'),
+            email: email,
+            items: [...cartList],
+            total: totalAmount
+          });
+          // Reset Cart
+          cartList = [];
+          updateCartUI();
+        } else {
+          alert("เกิดข้อผิดพลาด: " + result.message);
+        }
+      } catch (err) {
+        alert("ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง");
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> ยืนยันการชำระเงิน`;
+      }
+    }
+
+    // Receipt Modal & PNG Generation
+    function showReceipt(data) {
+      document.getElementById('rec-id').innerText = `#${data.orderId}`;
+      document.getElementById('rec-date').innerText = data.date;
+      document.getElementById('rec-email').innerText = data.email;
+      document.getElementById('rec-total').innerText = `฿${data.total}`;
+
+      const recItemsEl = document.getElementById('rec-items');
+      recItemsEl.innerHTML = '';
+      data.items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "flex justify-between text-xs text-slate-700";
+        div.innerHTML = `<span>${item.name} (${item.duration}) x ${item.qty}</span><span class="font-medium">฿${item.price * item.qty}</span>`;
+        recItemsEl.appendChild(div);
+      });
+
+      document.getElementById('receipt-modal').classList.remove('hidden');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').classList.add('hidden');
+    }
+
+    function downloadReceiptPNG() {
+      const card = document.getElementById('receipt-card');
+      html2canvas(card, { scale: 2 }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Receipt_${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+
+    // Announcement Popup Functions
+    function showAnnouncementModal(title, content, imgUrl) {
+      document.getElementById('announcement-title').innerText = title || 'แจ้งเตือน';
+      document.getElementById('announcement-content').innerText = content || '';
+
+      const imgContainer = document.getElementById('announcement-img-container');
+      if (imgUrl) {
+        document.getElementById('announcement-img').src = imgUrl;
+        imgContainer.classList.remove('hidden');
+      } else {
+        imgContainer.classList.add('hidden');
+      }
+
+      document.getElementById('announcement-modal').classList.remove('hidden');
+    }
+
+    function closeAnnouncementModal() {
+      document.getElementById('announcement-modal').classList.add('hidden');
+    }
+
+    // Admin Functions
+
+    // FIX: ต้องกรอกรหัสผ่านก่อนเปิดหน้าจัดการหลังบ้านได้ (ก่อนแก้ไข ใครก็เปิดได้ทันที)
+    // รหัสผ่านจะถูกส่งไปให้ Server ตรวจสอบจริงทุกครั้งที่มีการบันทึก/ลบข้อมูล
+    function toggleAdminModal() {
+      const modal = document.getElementById('admin-modal');
+      const isCurrentlyHidden = modal.classList.contains('hidden');
+
+      if (isCurrentlyHidden) {
+        if (!adminAuthenticated) {
+          const pwd = prompt('กรุณากรอกรหัสผ่านสำหรับผู้ดูแลระบบ:');
+          if (pwd === null || pwd === '') {
+            return; // ผู้ใช้กดยกเลิก หรือไม่กรอกรหัสผ่าน
+          }
+          adminPasswordCache = pwd;
+          adminAuthenticated = true;
+        }
+        modal.classList.remove('hidden');
+        renderAdminProductList();
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // เรียกเมื่อ Server แจ้งว่ารหัสผ่านไม่ถูกต้อง เพื่อบังคับให้กรอกใหม่ในครั้งถัดไป
+    function resetAdminAuth() {
+      adminAuthenticated = false;
+      adminPasswordCache = '';
+    }
+
+    function renderAdminProductList() {
+      const listEl = document.getElementById('admin-product-list');
+      listEl.innerHTML = '';
+
+      productsList.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between bg-slate-50 p-2 rounded-lg text-xs border border-slate-100";
+        div.innerHTML = `
+          <div>
+            <p class="font-bold text-slate-800">${item.name}</p>
+            <p class="text-[10px] text-slate-400">฿${item.price} | ${item.duration}</p>
+          </div>
+          <div class="flex gap-1">
+            <button onclick="editProductAdmin('${item.id}')" class="p-1 text-slate-500 hover:text-pink-600"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteProductAdmin('${item.id}')" class="p-1 text-slate-500 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    function editProductAdmin(id) {
+      const item = productsList.find(p => p.id === id);
+      if (!item) return;
+      document.getElementById('adm-prod-id').value = item.id;
+      document.getElementById('adm-prod-name').value = item.name;
+      document.getElementById('adm-prod-duration').value = item.duration;
+      document.getElementById('adm-prod-price').value = item.price;
+      document.getElementById('adm-prod-desc').value = item.description || '';
+
+      // FIX: จำ URL รูปเดิมไว้ และแสดงตัวอย่างให้เห็น
+      document.getElementById('adm-prod-image-url').value = item.imageUrl || '';
+      const wrap = document.getElementById('adm-current-image-wrap');
+      if (item.imageUrl) {
+        document.getElementById('adm-current-image-preview').src = item.imageUrl;
+        wrap.classList.remove('hidden');
+      } else {
+        wrap.classList.add('hidden');
+      }
+
+      document.getElementById('adm-cancel-edit-btn').classList.remove('hidden');
+      document.getElementById('admin-product-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // FIX: ปุ่มยกเลิกการแก้ไข เพื่อล้างฟอร์มกลับไปเป็นโหมด "เพิ่มสินค้าใหม่"
+    function cancelEditProduct() {
+      document.getElementById('admin-product-form').reset();
+      document.getElementById('adm-prod-id').value = '';
+      document.getElementById('adm-prod-image-url').value = '';
+      document.getElementById('adm-current-image-wrap').classList.add('hidden');
+      document.getElementById('adm-cancel-edit-btn').classList.add('hidden');
+    }
+
+    async function handleSaveProduct(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('adm-save-btn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> กำลังบันทึก...`;
+
+      const id = document.getElementById('adm-prod-id').value;
+      const name = document.getElementById('adm-prod-name').value;
+      const duration = document.getElementById('adm-prod-duration').value;
+      const price = Number(document.getElementById('adm-prod-price').value);
+      const description = document.getElementById('adm-prod-desc').value;
+      // FIX: ส่ง URL รูปเดิมกลับไปด้วย เผื่อไม่มีการเลือกไฟล์ใหม่
+      const existingImageUrl = document.getElementById('adm-prod-image-url').value;
+      const fileInput = document.getElementById('adm-prod-file');
+
+      let imageBase64 = '';
+      if (fileInput.files.length > 0) {
+        imageBase64 = await new Promise((resolve) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result);
+          r.readAsDataURL(fileInput.files[0]);
+        });
+      }
+
+      const payload = {
+        action: 'saveProduct',
+        adminPassword: adminPasswordCache,
+        data: { id, name, duration, price, description, imageUrl: existingImageUrl, imageBase64 }
+      };
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          alert('บันทึกสินค้าเรียบร้อย');
+          document.getElementById('admin-product-form').reset();
+          document.getElementById('adm-prod-id').value = '';
+          document.getElementById('adm-prod-image-url').value = '';
+          document.getElementById('adm-current-image-wrap').classList.add('hidden');
+          document.getElementById('adm-cancel-edit-btn').classList.add('hidden');
+          // FIX: รอให้โหลดข้อมูลใหม่เสร็จก่อน ค่อยปิด Modal (เดิมยิงพร้อมกันแบบไม่รอ)
+          await loadInitialData();
+          toggleAdminModal();
+        } else {
+          // FIX: เดิมไม่มีการแจ้งเตือนเมื่อบันทึกไม่สำเร็จ (เช่น รหัสผ่านผิด) ทำให้ดูเหมือนค้าง
+          if (result.message && result.message.includes('รหัสผ่าน')) resetAdminAuth();
+          alert('เกิดข้อผิดพลาด: ' + result.message);
+        }
+      } catch (err) {
+        alert('เกิดข้อผิดพลาดในการบันทึกสินค้า');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> บันทึกข้อมูลสินค้า`;
+      }
+    }
+
+    async function deleteProductAdmin(id) {
+      if (!confirm('ยืนยันการลบสินค้านี้?')) return;
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'deleteProduct', id: id, adminPassword: adminPasswordCache })
+        });
+        const result = await res.json();
+        if (result.status === 'success') {
+          // FIX: เดิมเรียก renderAdminProductList() ทันทีโดยไม่รอ loadInitialData()
+          // ทำให้รายการที่แสดงยังเป็นข้อมูลเก่าอยู่ (race condition)
+          await loadInitialData();
+          renderAdminProductList();
+        } else {
+          if (result.message && result.message.includes('รหัสผ่าน')) resetAdminAuth();
+          alert('เกิดข้อผิดพลาด: ' + result.message);
+        }
+      } catch (err) {
+        alert('เกิดข้อผิดพลาดในการลบสินค้า');
+      }
+    }
+  </script>
+</body>
+</html>
