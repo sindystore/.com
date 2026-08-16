@@ -203,6 +203,7 @@
                     <input type="hidden" id="ad-pd-id">
                     <div class="space-y-2 mb-3">
                         <input type="text" id="ad-pd-name" placeholder="ชื่อสินค้า (เช่น Netflix)" class="w-full border rounded-xl p-2.5 text-sm bg-gray-50">
+                        <input type="text" id="ad-pd-img" placeholder="URL รูปภาพสินค้า (เช่น https://...)" class="w-full border rounded-xl p-2.5 text-sm bg-gray-50">
                         <div class="grid grid-cols-2 gap-2">
                             <input type="text" id="ad-pd-dur" placeholder="ระยะเวลา" class="border rounded-xl p-2.5 text-sm bg-gray-50">
                             <input type="number" id="ad-pd-price" placeholder="ราคา" class="border rounded-xl p-2.5 text-sm bg-gray-50">
@@ -239,7 +240,7 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
                             <thead class="bg-gray-50/50 text-gray-500 text-xs">
-                                <tr><th class="px-4 py-2">สินค้า</th><th class="px-4 py-2">เวลา</th><th class="px-4 py-2">ราคา</th><th class="px-4 py-2">สต๊อก</th><th class="px-4 py-2 text-right">จัดการ</th></tr>
+                                <tr><th class="px-4 py-2">รูป</th><th class="px-4 py-2">สินค้า</th><th class="px-4 py-2">เวลา</th><th class="px-4 py-2">ราคา</th><th class="px-4 py-2">สต๊อก</th><th class="px-4 py-2 text-right">จัดการ</th></tr>
                             </thead>
                             <tbody id="ad-tb-prod" class="divide-y divide-gray-50"></tbody>
                         </table>
@@ -350,6 +351,7 @@
             list.innerHTML = appData.products.map(p => `
                 <div class="laser-box group">
                     <div class="laser-content">
+                        ${p.image ? `<img src="${p.image}" class="w-full h-32 object-cover rounded-xl mb-3 border border-gray-100 bg-gray-50" alt="${p.name}">` : ''}
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="font-bold text-lg text-gray-800">${p.name}</h3>
                             <span class="bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-1 rounded-lg border border-purple-100">${p.duration}</span>
@@ -398,7 +400,10 @@
                 total += parseFloat(item.price);
                 return `
                 <div class="flex justify-between items-center py-2 ${idx !== 0 ? 'border-t border-gray-50' : ''}">
-                    <div><h4 class="font-bold text-sm text-gray-800">${item.name}</h4><p class="text-[10px] text-gray-400">${item.duration}</p></div>
+                    <div class="flex items-center gap-3">
+                        ${item.image ? `<img src="${item.image}" class="w-10 h-10 rounded-lg object-cover bg-gray-50">` : ''}
+                        <div><h4 class="font-bold text-sm text-gray-800">${item.name}</h4><p class="text-[10px] text-gray-400">${item.duration}</p></div>
+                    </div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-sm">฿${item.price}</span>
                         <button onclick="delCart(${idx})" class="text-red-400 bg-red-50 w-7 h-7 rounded-full text-xs"><i class="fa-solid fa-xmark"></i></button>
@@ -486,7 +491,9 @@
 
             // Tables
             document.getElementById('ad-tb-prod').innerHTML = appData.products.map(p => `
-                <tr class="hover:bg-gray-50"><td class="px-4 py-2">${p.name}</td><td class="px-4 py-2">${p.duration}</td><td class="px-4 py-2">฿${p.price}</td>
+                <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2">${p.image ? `<img src="${p.image}" class="w-8 h-8 rounded-lg object-cover">` : '<div class="w-8 h-8 bg-gray-100 rounded-lg"></div>'}</td>
+                <td class="px-4 py-2">${p.name}</td><td class="px-4 py-2">${p.duration}</td><td class="px-4 py-2">฿${p.price}</td>
                 <td class="px-4 py-2">${p.stockCount}</td>
                 <td class="px-4 py-2 text-right"><button onclick="editP('${p.id}')" class="text-blue-500 mr-2"><i class="fa-solid fa-pen"></i></button><button onclick="delP('${p.id}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>
             `).join('');
@@ -501,10 +508,27 @@
         }
 
         // Admin Prod Actions
-        function clearProdForm() { ['id','name','dur','price','det'].forEach(x => document.getElementById(`ad-pd-${x}`).value = ''); }
-        function editP(id) { const p = appData.products.find(x => x.id == id); if(p){ document.getElementById('ad-pd-id').value=p.id; document.getElementById('ad-pd-name').value=p.name; document.getElementById('ad-pd-dur').value=p.duration; document.getElementById('ad-pd-price').value=p.price; document.getElementById('ad-pd-det').value=p.details; } }
+        function clearProdForm() { ['id','name','img','dur','price','det'].forEach(x => document.getElementById(`ad-pd-${x}`).value = ''); }
+        function editP(id) { 
+            const p = appData.products.find(x => x.id == id); 
+            if(p){ 
+                document.getElementById('ad-pd-id').value=p.id; 
+                document.getElementById('ad-pd-name').value=p.name; 
+                document.getElementById('ad-pd-img').value=p.image || ""; 
+                document.getElementById('ad-pd-dur').value=p.duration; 
+                document.getElementById('ad-pd-price').value=p.price; 
+                document.getElementById('ad-pd-det').value=p.details; 
+            } 
+        }
         async function saveProduct() {
-            const data = { id: document.getElementById('ad-pd-id').value, name: document.getElementById('ad-pd-name').value, duration: document.getElementById('ad-pd-dur').value, price: document.getElementById('ad-pd-price').value, details: document.getElementById('ad-pd-det').value };
+            const data = { 
+                id: document.getElementById('ad-pd-id').value, 
+                name: document.getElementById('ad-pd-name').value, 
+                image: document.getElementById('ad-pd-img').value,
+                duration: document.getElementById('ad-pd-dur').value, 
+                price: document.getElementById('ad-pd-price').value, 
+                details: document.getElementById('ad-pd-det').value 
+            };
             if(!data.name || !data.price) return alert("กรอกข้อมูลให้ครบ");
             loading(true); await api("adminSaveProduct", data); clearProdForm(); await loadData(); renderAdmin(); loading(false);
         }
