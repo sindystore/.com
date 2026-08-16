@@ -348,8 +348,9 @@
             const list = document.getElementById('product-list');
             if(appData.products.length === 0) return list.innerHTML = '<p class="col-span-full text-center text-gray-400">ยังไม่มีสินค้า</p>';
             
+            // เพิ่ม cursor-pointer และ onclick ที่กรอบ laser-box
             list.innerHTML = appData.products.map(p => `
-                <div class="laser-box group">
+                <div class="laser-box group cursor-pointer" onclick="showProductDetail('${p.id}')">
                     <div class="laser-content">
                         ${p.image ? `<img src="${p.image}" class="w-full h-32 object-cover rounded-xl mb-3 border border-gray-100 bg-gray-50" alt="${p.name}">` : ''}
                         <div class="flex justify-between items-start mb-2">
@@ -362,14 +363,59 @@
                         </div>
                         <div class="mt-4 flex items-center justify-between border-t border-gray-50 pt-3">
                             <span class="text-xl font-bold text-pink-500">฿${p.price}</span>
-                            <button onclick="addCart('${p.id}')" ${p.stockCount === 0 ? 'disabled' : ''} 
-                                class="bg-gray-900 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-purple-600 transition disabled:bg-gray-200 shadow-sm">
+                            <button onclick="event.stopPropagation(); addCart('${p.id}')" ${p.stockCount === 0 ? 'disabled' : ''} 
+                                class="bg-gray-900 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-purple-600 transition disabled:bg-gray-200 shadow-sm z-10 relative">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // ---------------- Popup แสดงรายละเอียดสินค้า ----------------
+        function showProductDetail(id) {
+            const p = appData.products.find(x => x.id == id);
+            if(!p) return;
+            
+            Swal.fire({
+                html: `
+                    <div class="text-left font-sans mt-2">
+                        ${p.image ? `<img src="${p.image}" class="w-full h-48 object-cover rounded-xl mb-4 border border-gray-100 bg-gray-50 shadow-sm">` : ''}
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-bold text-xl text-gray-800">${p.name}</h3>
+                            <span class="bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-1 rounded-lg border border-purple-100">${p.duration}</span>
+                        </div>
+                        <div class="text-sm ${p.stockCount > 0 ? 'text-green-500' : 'text-red-500'} font-medium mb-3">
+                            <i class="fa-solid fa-box-open mr-1"></i> สถานะ: ${p.stockCount > 0 ? `พร้อมส่ง (${p.stockCount} ชิ้น)` : 'สินค้าหมด'}
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-4 mb-4 max-h-48 overflow-y-auto text-sm text-gray-600 whitespace-pre-line border border-gray-100 shadow-inner">
+                            ${p.details || 'ไม่มีรายละเอียดเพิ่มเติม'}
+                        </div>
+                        <div class="flex items-center justify-between mt-2 px-1">
+                            <span class="text-gray-500 text-sm">ราคา</span>
+                            <span class="text-2xl font-bold text-pink-500">฿${p.price}</span>
+                        </div>
+                    </div>
+                `,
+                showCloseButton: true,
+                showConfirmButton: p.stockCount > 0,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-solid fa-cart-plus mr-1"></i> เพิ่มลงตระกร้า',
+                cancelButtonText: 'ปิด',
+                confirmButtonColor: '#111827', // สีดำเข้ม
+                cancelButtonColor: '#f3f4f6',  // สีเทาอ่อน
+                customClass: {
+                    popup: 'rounded-3xl p-4',
+                    cancelButton: 'text-gray-600 font-bold rounded-xl px-5 py-2.5',
+                    confirmButton: 'text-white font-bold rounded-xl px-5 py-2.5 shadow-md hover:bg-purple-600 transition'
+                }
+            }).then((result) => {
+                // ถ้ายืนยันกดเพิ่มลงตะกร้า
+                if (result.isConfirmed && p.stockCount > 0) {
+                    addCart(p.id);
+                }
+            });
         }
 
         function addCart(id) {
