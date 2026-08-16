@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>storesinsindy</title>
+    <title>ร้าน SNI sindy</title>
     
-    <!-- PWA Meta Tags (No browser bar) -->
+    <!-- PWA Setup -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="white">
-    <meta name="apple-mobile-web-app-title" content="sindystore">
+    <meta name="apple-mobile-web-app-title" content="SNI sindy">
     <meta name="theme-color" content="#ffffff">
     
-    <!-- Libraries -->
+    <!-- CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -20,333 +20,348 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
         
-        body { font-family: 'Kanit', sans-serif; background-color: #fcfcfc; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Kanit', sans-serif; background-color: #fafafa; -webkit-tap-highlight-color: transparent; }
         
-        /* Laser Border Animation */
+        /* Laser Border */
         .laser-box {
-            position: relative;
-            border-radius: 1.25rem;
-            background: #fff;
-            padding: 3px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s;
+            position: relative; border-radius: 1.25rem; background: #fff; padding: 3px;
+            overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); transition: transform 0.2s;
         }
         .laser-box:hover { transform: translateY(-3px); }
         .laser-box::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: conic-gradient(transparent, transparent, transparent, #d8b4fe, #a855f7, transparent);
-            animation: rotate 4s linear infinite;
-            z-index: 0;
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, #c084fc, #f472b6, transparent);
+            animation: rotate 3s linear infinite; z-index: 0;
         }
         .laser-content {
-            position: relative;
-            background: #ffffff;
-            border-radius: 1.1rem;
-            z-index: 1;
-            height: 100%;
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
+            position: relative; background: #ffffff; border-radius: 1.1rem; z-index: 1;
+            height: 100%; padding: 1.25rem; display: flex; flex-direction: column;
         }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-
         /* Loader */
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #a855f7; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;}
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #c084fc; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Page Transitions */
+        /* Pages */
         .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        .btn-gradient { background: linear-gradient(135deg, #c084fc, #ec4899); color: white; transition: opacity 0.2s; }
-        .btn-gradient:hover { opacity: 0.9; }
-        .btn-gradient:active { transform: scale(0.98); }
+        /* UI Elements */
+        .btn-main { background: linear-gradient(135deg, #a855f7, #ec4899); color: white; transition: opacity 0.2s; }
+        .btn-main:hover { opacity: 0.9; }
+        .btn-main:active { transform: scale(0.98); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
     </style>
 </head>
-<body class="text-gray-800 pb-20">
+<body class="text-gray-800 pb-24">
 
     <!-- Navbar -->
-    <nav class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-3 cursor-pointer" id="logo-btn" onclick="goHome()">
-            <img src="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png" alt="Logo" class="w-10 h-10 rounded-full shadow-sm object-cover">
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 px-4 py-3 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-3 cursor-pointer" id="logo-trigger" onclick="goHome()">
+            <img src="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png" class="w-10 h-10 rounded-full object-cover border border-purple-100">
             <h1 class="font-semibold text-lg bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">SNI sindy</h1>
         </div>
-        <div class="relative cursor-pointer bg-gray-50 p-2 rounded-full shadow-sm" onclick="showCart()">
-            <i class="fa-solid fa-cart-shopping text-gray-600 text-lg"></i>
-            <span id="cart-badge" class="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full hidden">0</span>
+        <div class="relative cursor-pointer bg-purple-50 p-2.5 rounded-full hover:bg-purple-100 transition" onclick="showCart()">
+            <i class="fa-solid fa-basket-shopping text-purple-600 text-lg"></i>
+            <span id="cart-badge" class="absolute -top-1 -right-1 bg-pink-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-sm hidden">0</span>
         </div>
     </nav>
 
-    <!-- Global Loading Overlay -->
-    <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
+    <!-- Global Loading -->
+    <div id="loading" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex-col items-center justify-center hidden">
         <div class="loader mb-3"></div>
-        <p class="text-gray-500 text-sm animate-pulse">กำลังประมวลผล...</p>
+        <p class="text-purple-500 text-sm font-medium animate-pulse">กำลังประมวลผล...</p>
     </div>
 
-    <!-- MAIN STORE PAGE -->
-    <main id="page-store" class="page active container mx-auto px-4 pt-6 max-w-4xl">
+    <!-- MAIN STORE -->
+    <main id="page-store" class="page active container mx-auto px-4 pt-8 max-w-5xl">
         <div class="text-center mb-8">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">พรีเมียมแอปราคาถูก</h2>
-            <p class="text-gray-500 text-sm">บริการรวดเร็ว สินค้าคุณภาพ รับประกันตลอดอายุการใช้งาน</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">แอพพรีเมียมราคาถูก</h2>
+            <p class="text-gray-500 text-sm">บริการอัตโนมัติ 24 ชม. รับสินค้าทันทีหลังชำระเงิน</p>
         </div>
-        <!-- Product Grid -->
-        <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <!-- Render via JS -->
+        <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <div class="col-span-full text-center py-10"><div class="loader"></div></div>
         </div>
     </main>
 
-    <!-- CART & CHECKOUT PAGE -->
+    <!-- CART & CHECKOUT -->
     <main id="page-cart" class="page container mx-auto px-4 pt-6 max-w-md">
         <div class="flex items-center mb-6">
-            <button onclick="goHome()" class="text-gray-400 hover:text-gray-700 mr-3"><i class="fa-solid fa-arrow-left text-xl"></i></button>
-            <h2 class="text-xl font-bold">ตระกร้าสินค้า</h2>
+            <button onclick="goHome()" class="text-gray-400 hover:text-gray-700 mr-3 p-2 bg-white rounded-full shadow-sm"><i class="fa-solid fa-arrow-left"></i></button>
+            <h2 class="text-xl font-bold">ตระกร้าของคุณ</h2>
         </div>
 
-        <!-- Cart Items -->
-        <div id="cart-items" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4"></div>
+        <div id="cart-items" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4 space-y-2"></div>
 
-        <!-- Total -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6 flex justify-between items-center font-bold text-lg">
-            <span>ยอดชำระทั้งหมด</span>
-            <span id="cart-total" class="text-purple-600">฿0.00</span>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6 flex justify-between items-center font-bold">
+            <span class="text-gray-600">ยอดชำระทั้งหมด</span>
+            <span id="cart-total" class="text-purple-600 text-xl">฿0.00</span>
         </div>
 
-        <!-- Checkout Form -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
-            <h3 class="font-bold mb-4 text-gray-700"><i class="fa-solid fa-qrcode mr-2 text-purple-500"></i>ชำระเงิน</h3>
-            <div class="text-center mb-4">
-                <img src="https://s.imgz.io/2026/07/15/IMG_75242612165b6fd16c31.jpeg" alt="QR Code" class="w-48 mx-auto rounded-xl border border-gray-200">
-                <p class="text-sm font-semibold mt-2 text-gray-700">ร้านค้าออมสินมหาเฮง (คิงแอดส์)</p>
+            <h3 class="font-bold mb-4 text-gray-700"><i class="fa-solid fa-qrcode mr-2 text-pink-500"></i>ชำระเงิน</h3>
+            <div class="text-center mb-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <img src="https://s.imgz.io/2026/07/15/IMG_75242612165b6fd16c31.jpeg" class="w-48 mx-auto rounded-xl shadow-sm mb-2">
+                <p class="text-sm font-semibold text-gray-700">ร้านค้าออมสินมหาเฮง (คิงแอดส์)</p>
             </div>
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1"><i class="fa-solid fa-envelope mr-1"></i>อีเมลสำหรับรับสินค้า</label>
-                    <input type="email" id="checkout-email" class="w-full border border-gray-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-50" placeholder="example@email.com" required>
+                    <label class="block text-sm font-medium text-gray-600 mb-1"><i class="fa-solid fa-envelope mr-1"></i>อีเมลสำหรับรับแจ้งเตือน</label>
+                    <input type="email" id="checkout-email" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400 bg-gray-50 text-sm" placeholder="example@email.com" required>
                 </div>
-                
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1"><i class="fa-solid fa-image mr-1"></i>แนบสลิปโอนเงิน</label>
-                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-50 transition relative overflow-hidden bg-gray-50">
-                        <div id="slip-preview" class="flex flex-col items-center justify-center pt-5 pb-6">
-                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-purple-400 mb-2"></i>
-                            <p class="text-sm text-gray-500 font-medium">คลิกหรือลากสลิปมาวาง</p>
+                    <label class="block text-sm font-medium text-gray-600 mb-1"><i class="fa-solid fa-image mr-1"></i>อัพโหลดสลิป</label>
+                    <label class="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-purple-200 rounded-xl cursor-pointer hover:bg-purple-50 transition relative overflow-hidden bg-gray-50">
+                        <div id="slip-preview" class="flex flex-col items-center justify-center">
+                            <div class="bg-white p-3 rounded-full shadow-sm mb-2"><i class="fa-solid fa-cloud-arrow-up text-xl text-purple-500"></i></div>
+                            <p class="text-xs text-gray-500 font-medium">แตะเพื่อแนบสลิป</p>
                         </div>
-                        <img id="slip-image" class="absolute inset-0 w-full h-full object-contain hidden" />
-                        <input type="file" id="checkout-slip" class="hidden" accept="image/*" onchange="previewSlip(event)" />
+                        <img id="slip-image" class="absolute inset-0 w-full h-full object-contain hidden bg-black/5" />
+                        <input type="file" id="checkout-slip" class="hidden" accept="image/*" onchange="handleSlip(event)" />
                     </label>
                 </div>
-
-                <button id="btn-confirm" onclick="confirmCheckout()" class="w-full btn-gradient py-3 rounded-xl font-semibold shadow-lg shadow-purple-200 flex justify-center items-center gap-2 mt-4">
-                    <i class="fa-solid fa-check-circle"></i> ยืนยันการสั่งซื้อ
+                <button id="btn-confirm" onclick="processCheckout()" class="w-full btn-main py-3.5 rounded-xl font-bold shadow-lg shadow-purple-200 flex justify-center items-center gap-2 mt-2">
+                    <i class="fa-solid fa-check-circle"></i> ยืนยันคำสั่งซื้อ
                 </button>
             </div>
         </div>
     </main>
 
-    <!-- RECEIPT PAGE -->
-    <main id="page-receipt" class="page container mx-auto px-4 pt-6 max-w-md">
+    <!-- RECEIPT -->
+    <main id="page-receipt" class="page container mx-auto px-4 pt-8 max-w-md">
         <div class="text-center mb-6">
-            <h2 class="text-xl font-bold text-green-500"><i class="fa-solid fa-circle-check mr-2"></i>สั่งซื้อสำเร็จ</h2>
-            <p class="text-sm text-gray-500 mt-1">ระบบจัดส่งสินค้าไปที่อีเมลของคุณเรียบร้อยแล้ว</p>
+            <div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-sm"><i class="fa-solid fa-check"></i></div>
+            <h2 class="text-xl font-bold text-gray-800">ทำรายการสำเร็จ!</h2>
+            <p class="text-sm text-gray-500">ระบบได้ส่งสินค้าให้คุณเรียบร้อยแล้ว</p>
         </div>
 
-        <!-- Receipt Card for Capture -->
         <div id="receipt-card" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden mb-6">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-400 to-pink-400"></div>
-            <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-4">
-                <img src="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png" class="w-12 h-12 rounded-full">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-purple-400 to-pink-400"></div>
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-4 mb-4 mt-2">
+                <img src="https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png" class="w-10 h-10 rounded-full">
                 <div>
-                    <h3 class="font-bold text-gray-800">ใบเสร็จรับเงิน</h3>
-                    <p class="text-xs text-gray-500">SNI sindy</p>
+                    <h3 class="font-bold text-gray-800 text-sm">ใบเสร็จรับเงิน / รับสินค้า</h3>
+                    <p class="text-[10px] text-gray-500">ร้าน SNI sindy</p>
                 </div>
             </div>
-            <div class="text-sm space-y-2 mb-4 text-gray-600">
+            <div class="text-xs space-y-1.5 mb-4 text-gray-600">
                 <div class="flex justify-between"><span>วันที่:</span> <span id="r-date" class="font-medium"></span></div>
-                <div class="flex justify-between"><span>รหัสสั่งซื้อ:</span> <span id="r-order" class="font-medium text-xs"></span></div>
-                <div class="flex justify-between"><span>ส่งไปที่:</span> <span id="r-email" class="font-medium"></span></div>
+                <div class="flex justify-between"><span>รหัส:</span> <span id="r-order" class="font-medium"></span></div>
+                <div class="flex justify-between"><span>อีเมล:</span> <span id="r-email" class="font-medium"></span></div>
             </div>
+            
             <div class="border-t border-dashed border-gray-200 pt-4 mb-4">
-                <p class="text-xs text-gray-400 mb-2">รายการสินค้า</p>
-                <div id="r-items" class="space-y-1 text-sm text-gray-700 font-medium"></div>
+                <p class="text-[10px] text-purple-500 font-bold mb-2"><i class="fa-solid fa-key mr-1"></i> ข้อมูลสินค้าที่ได้รับ</p>
+                <div id="r-delivered" class="bg-purple-50 p-3 rounded-xl text-xs text-gray-700 font-medium space-y-2 border border-purple-100"></div>
             </div>
-            <div class="bg-gray-50 p-3 rounded-xl flex justify-between items-center font-bold">
-                <span class="text-gray-600">ยอดสุทธิ</span>
-                <span id="r-total" class="text-purple-600 text-lg"></span>
+
+            <div class="bg-gray-50 p-3 rounded-xl flex justify-between items-center font-bold mt-4">
+                <span class="text-gray-600 text-sm">ยอดชำระ</span>
+                <span id="r-total" class="text-pink-500 text-lg"></span>
             </div>
-            <p class="text-[10px] text-center text-gray-400 mt-6">ขอบคุณที่ใช้บริการ ขอให้สนุกกับแอพพรีเมียม</p>
         </div>
 
-        <button onclick="saveReceipt()" class="w-full bg-gray-800 text-white py-3 rounded-xl font-semibold shadow-md flex justify-center items-center gap-2 mb-3">
-            <i class="fa-solid fa-download"></i> บันทึกใบเสร็จ (PNG)
-        </button>
-        <button onclick="goHome()" class="w-full bg-white border border-gray-200 text-gray-600 py-3 rounded-xl font-semibold hover:bg-gray-50">
-            กลับหน้าหลัก
-        </button>
+        <div class="space-y-3">
+            <button onclick="downloadReceipt()" class="w-full bg-gray-900 text-white py-3.5 rounded-xl font-bold shadow-md flex justify-center items-center gap-2">
+                <i class="fa-solid fa-download"></i> บันทึกใบเสร็จ
+            </button>
+            <button onclick="goHome()" class="w-full bg-white border border-gray-200 text-gray-600 py-3.5 rounded-xl font-bold hover:bg-gray-50">
+                กลับหน้าหลัก
+            </button>
+        </div>
     </main>
 
-    <!-- ADMIN PAGE -->
-    <main id="page-admin" class="page container mx-auto px-4 pt-6 max-w-4xl">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-800"><i class="fa-solid fa-gear mr-2 text-purple-500"></i>ระบบหลังบ้าน</h2>
-            <button onclick="goHome()" class="bg-gray-100 px-4 py-2 rounded-lg text-sm"><i class="fa-solid fa-xmark"></i> ปิด</button>
+    <!-- ADMIN PANEL -->
+    <main id="page-admin" class="page container mx-auto px-4 pt-6 max-w-5xl">
+        <div class="flex items-center justify-between mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+            <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-shield-halved mr-2 text-purple-500"></i>จัดการหลังบ้าน</h2>
+            <button onclick="goHome()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-sm font-bold"><i class="fa-solid fa-power-off"></i> ออก</button>
         </div>
 
-        <!-- Popup Setting -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-            <h3 class="font-bold mb-3"><i class="fa-solid fa-comment-dots mr-2"></i>ตั้งค่า Popup ตอนเปิดเว็บ</h3>
-            <textarea id="admin-popup-msg" class="w-full border border-gray-200 rounded-lg p-3 text-sm mb-2" rows="2" placeholder="ข้อความต้อนรับ"></textarea>
-            <input type="text" id="admin-popup-img" class="w-full border border-gray-200 rounded-lg p-3 text-sm mb-3" placeholder="URL รูปภาพ (ถ้ามี)">
-            <button onclick="adminSavePopup()" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm w-full font-medium"><i class="fa-solid fa-save mr-1"></i>บันทึก Popup</button>
-        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Col: Forms -->
+            <div class="space-y-6">
+                <!-- Popup Form -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold mb-3 text-sm"><i class="fa-solid fa-message mr-2"></i>ตั้งค่า Popup</h3>
+                    <textarea id="ad-pop-msg" class="w-full border rounded-xl p-3 text-sm bg-gray-50 mb-2" rows="2" placeholder="ข้อความต้อนรับ"></textarea>
+                    <input type="text" id="ad-pop-img" class="w-full border rounded-xl p-3 text-sm bg-gray-50 mb-3" placeholder="URL รูปภาพ (ถ้ามี)">
+                    <button onclick="savePopup()" class="w-full bg-blue-500 text-white py-2 rounded-xl text-sm font-bold">บันทึก Popup</button>
+                </div>
 
-        <!-- Add Product -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 mb-6">
-            <h3 class="font-bold mb-3"><i class="fa-solid fa-plus mr-2"></i>เพิ่ม/แก้ไข สินค้า</h3>
-            <input type="hidden" id="admin-prod-id">
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <input type="text" id="admin-prod-name" placeholder="ชื่อสินค้า (เช่น Netflix)" class="col-span-2 border rounded-lg p-2 text-sm bg-gray-50">
-                <input type="text" id="admin-prod-dur" placeholder="ระยะเวลา (เช่น 30 วัน)" class="border rounded-lg p-2 text-sm bg-gray-50">
-                <input type="number" id="admin-prod-price" placeholder="ราคา (เช่น 99)" class="border rounded-lg p-2 text-sm bg-gray-50">
-                <textarea id="admin-prod-detail" placeholder="รายละเอียดเพิ่มเติม" class="col-span-2 border rounded-lg p-2 text-sm bg-gray-50" rows="2"></textarea>
+                <!-- Product Form -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold mb-3 text-sm flex justify-between">
+                        <span><i class="fa-solid fa-box mr-2"></i>เพิ่ม/แก้ไข สินค้า</span>
+                        <button onclick="clearProdForm()" class="text-xs text-gray-400 hover:text-gray-600"><i class="fa-solid fa-eraser"></i> เคลียร์</button>
+                    </h3>
+                    <input type="hidden" id="ad-pd-id">
+                    <div class="space-y-2 mb-3">
+                        <input type="text" id="ad-pd-name" placeholder="ชื่อสินค้า (เช่น Netflix)" class="w-full border rounded-xl p-2.5 text-sm bg-gray-50">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="text" id="ad-pd-dur" placeholder="ระยะเวลา" class="border rounded-xl p-2.5 text-sm bg-gray-50">
+                            <input type="number" id="ad-pd-price" placeholder="ราคา" class="border rounded-xl p-2.5 text-sm bg-gray-50">
+                        </div>
+                        <textarea id="ad-pd-det" placeholder="รายละเอียด..." class="w-full border rounded-xl p-2.5 text-sm bg-gray-50" rows="2"></textarea>
+                    </div>
+                    <button onclick="saveProduct()" class="w-full bg-green-500 text-white py-2 rounded-xl text-sm font-bold">บันทึกสินค้า</button>
+                </div>
+
+                <!-- Stock Form -->
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 class="font-bold mb-3 text-sm flex justify-between">
+                        <span><i class="fa-solid fa-layer-group mr-2"></i>เพิ่ม/แก้ไข สต๊อก</span>
+                        <button onclick="clearStockForm()" class="text-xs text-gray-400 hover:text-gray-600"><i class="fa-solid fa-eraser"></i> เคลียร์</button>
+                    </h3>
+                    <input type="hidden" id="ad-st-id">
+                    <div class="space-y-2 mb-3">
+                        <select id="ad-st-pdid" class="w-full border rounded-xl p-2.5 text-sm bg-gray-50 outline-none"></select>
+                        <input type="text" id="ad-st-data" placeholder="ข้อมูลบัญชี (เช่น Email:Pass)" class="w-full border rounded-xl p-2.5 text-sm bg-gray-50">
+                        <select id="ad-st-stat" class="w-full border rounded-xl p-2.5 text-sm bg-gray-50 outline-none">
+                            <option value="Available">Available (พร้อมขาย)</option>
+                            <option value="Used">Used (ใช้แล้ว)</option>
+                        </select>
+                    </div>
+                    <button onclick="saveStock()" class="w-full bg-purple-500 text-white py-2 rounded-xl text-sm font-bold">บันทึกสต๊อก</button>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="adminSaveProduct()" class="bg-green-500 text-white px-4 py-2 rounded-lg text-sm flex-1 font-medium"><i class="fa-solid fa-save mr-1"></i>บันทึกสินค้า</button>
-                <button onclick="adminClearForm()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium"><i class="fa-solid fa-eraser"></i></button>
-            </div>
-        </div>
 
-        <!-- Product List Admin -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left text-gray-500">
-                    <thead class="bg-gray-50 text-gray-700">
-                        <tr>
-                            <th class="px-4 py-3">สินค้า</th>
-                            <th class="px-4 py-3">เวลา</th>
-                            <th class="px-4 py-3">ราคา</th>
-                            <th class="px-4 py-3 text-right">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-product-table"></tbody>
-                </table>
+            <!-- Right Col: Tables -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Product Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 font-bold text-sm text-gray-700">รายการสินค้า</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50/50 text-gray-500 text-xs">
+                                <tr><th class="px-4 py-2">สินค้า</th><th class="px-4 py-2">เวลา</th><th class="px-4 py-2">ราคา</th><th class="px-4 py-2">สต๊อก</th><th class="px-4 py-2 text-right">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="ad-tb-prod" class="divide-y divide-gray-50"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Stock Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3 border-b border-gray-100 font-bold text-sm text-gray-700">รายการสต๊อก</div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50/50 text-gray-500 text-xs">
+                                <tr><th class="px-4 py-2">สินค้าที่ผูก</th><th class="px-4 py-2">ข้อมูลบัญชี</th><th class="px-4 py-2">สถานะ</th><th class="px-4 py-2 text-right">จัดการ</th></tr>
+                            </thead>
+                            <tbody id="ad-tb-stock" class="divide-y divide-gray-50"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
     <script>
         // ==========================================
-        // ตั้งค่า URL ของ Web App จาก Google Apps Script
+        // ใส่ URL Web App ของคุณที่นี่
         // ==========================================
         const GAS_URL = "https://script.google.com/macros/s/AKfycby4U2WyNN3yNobTLpk7dZhitQ2p_wlRl-qqACus2KHQP2dlwIerTyxcpO6yeOTyKClS1w/exec"; 
 
-        // State Management
-        let appState = {
-            products: [],
-            cart: [],
-            popup: { message: "", image: "" }
-        };
+        // State
+        let appData = { products: [], stocks: [], cart: [], popup: {} };
+        let slipBase64 = "";
 
-        // Initialize App
+        // Init
         document.addEventListener('DOMContentLoaded', () => {
-            generatePWAManifest();
-            checkBrowserAndPWA();
-            fetchData();
+            setupPWA();
+            checkBrowser();
+            loadData();
 
-            // Admin entry logic (Click logo 5 times)
-            let clickCount = 0;
-            document.getElementById('logo-btn').addEventListener('click', () => {
-                clickCount++;
-                if(clickCount >= 5) {
-                    clickCount = 0;
-                    showPage('page-admin');
-                    renderAdminTable();
+            // Admin Login Trigger
+            let clicks = 0;
+            document.getElementById('logo-trigger').addEventListener('click', () => {
+                clicks++;
+                if(clicks >= 5) {
+                    clicks = 0;
+                    Swal.fire({
+                        title: 'เข้าสู่ระบบหลังบ้าน', input: 'password',
+                        confirmButtonText: 'เข้าสู่ระบบ', confirmButtonColor: '#a855f7',
+                        showCancelButton: true
+                    }).then(res => {
+                        if(res.value === '0000s') { showPage('page-admin'); renderAdmin(); }
+                        else if(res.value) Swal.fire({icon: 'error', title: 'รหัสผิด!', text: 'ไม่มีสิทธิ์เข้าถึง'});
+                    });
                 }
-                setTimeout(()=> clickCount = 0, 2000);
+                setTimeout(() => clicks = 0, 2000);
             });
         });
 
-        // ---------------- API Calls ----------------
-        async function fetchGAS(action, data = {}) {
+        // ---------------- API ----------------
+        async function api(action, data = {}) {
             try {
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: action, data: data })
+                const res = await fetch(GAS_URL, {
+                    method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action, data })
                 });
-                return await response.json();
-            } catch (error) {
-                console.error("API Error:", error);
-                return { status: 'error', message: 'การเชื่อมต่อขัดข้อง' };
+                return await res.json();
+            } catch (err) {
+                return { status: 'error', message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ' };
             }
         }
 
-        async function fetchData() {
-            const res = await fetchGAS("getData");
+        async function loadData() {
+            document.getElementById('product-list').innerHTML = '<div class="col-span-full text-center py-10"><div class="loader"></div></div>';
+            const res = await api("getData");
             if (res.status === "success") {
-                appState.products = res.data.products;
-                appState.popup = res.data.popup;
+                appData.products = res.data.products;
+                appData.stocks = res.data.stocks;
+                appData.popup = res.data.popup;
+                renderStore();
                 
-                renderProducts();
-                
-                // Show Welcome Popup once
-                if(!sessionStorage.getItem('popupShown') && appState.popup.message) {
+                // Show Popup
+                if(!sessionStorage.getItem('welcomed') && appData.popup.message) {
                     Swal.fire({
-                        title: 'ยินดีต้อนรับ!',
-                        text: appState.popup.message,
-                        imageUrl: appState.popup.image || null,
-                        imageHeight: appState.popup.image ? 150 : null,
-                        confirmButtonText: 'รับทราบ',
-                        confirmButtonColor: '#a855f7',
-                        customClass: { popup: 'rounded-2xl' }
+                        title: 'ประกาศ', text: appData.popup.message, imageUrl: appData.popup.image || null,
+                        imageHeight: appData.popup.image ? 150 : null, confirmButtonText: 'รับทราบ',
+                        confirmButtonColor: '#a855f7', customClass: { popup: 'rounded-3xl' }
                     });
-                    sessionStorage.setItem('popupShown', 'true');
+                    sessionStorage.setItem('welcomed', 'true');
                 }
             } else {
-                document.getElementById('product-list').innerHTML = '<p class="col-span-full text-center text-gray-500 text-sm">ไม่สามารถโหลดข้อมูลได้</p>';
+                document.getElementById('product-list').innerHTML = '<p class="col-span-full text-center text-red-400">โหลดข้อมูลไม่สำเร็จ</p>';
             }
         }
 
-        // ---------------- UI Navigation ----------------
-        function showPage(pageId) {
+        // ---------------- UI Helpers ----------------
+        function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+            document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
         }
         function goHome() { showPage('page-store'); }
-        function showLoading(show) {
-            document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
-        }
+        function loading(show) { document.getElementById('loading').style.display = show ? 'flex' : 'none'; }
 
-        // ---------------- Store & Cart Logic ----------------
-        function renderProducts() {
-            const container = document.getElementById('product-list');
-            if (appState.products.length === 0) {
-                container.innerHTML = '<p class="col-span-full text-center text-gray-500 text-sm">ยังไม่มีสินค้า</p>';
-                return;
-            }
-
-            container.innerHTML = appState.products.map(p => `
+        // ---------------- Store & Cart ----------------
+        function renderStore() {
+            const list = document.getElementById('product-list');
+            if(appData.products.length === 0) return list.innerHTML = '<p class="col-span-full text-center text-gray-400">ยังไม่มีสินค้า</p>';
+            
+            list.innerHTML = appData.products.map(p => `
                 <div class="laser-box group">
-                    <div class="laser-content flex flex-col h-full">
-                        <div class="flex justify-between items-start mb-3">
+                    <div class="laser-content">
+                        <div class="flex justify-between items-start mb-2">
                             <h3 class="font-bold text-lg text-gray-800">${p.name}</h3>
-                            <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-md">${p.duration}</span>
+                            <span class="bg-purple-50 text-purple-600 text-[10px] font-bold px-2 py-1 rounded-lg border border-purple-100">${p.duration}</span>
                         </div>
-                        <p class="text-gray-500 text-xs mb-4 line-clamp-2">${p.details}</p>
-                        <div class="mt-auto flex items-center justify-between">
-                            <span class="text-xl font-bold text-gray-800">฿${p.price}</span>
-                            <button onclick="addToCart('${p.id}')" class="bg-gray-900 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-purple-600 transition shadow-md group-hover:scale-105">
+                        <p class="text-[11px] text-gray-400 mb-3 line-clamp-2">${p.details}</p>
+                        <div class="text-[10px] ${p.stockCount > 0 ? 'text-green-500' : 'text-red-500'} mb-auto font-medium">
+                            <i class="fa-solid fa-box-open mr-1"></i> คงเหลือ: ${p.stockCount}
+                        </div>
+                        <div class="mt-4 flex items-center justify-between border-t border-gray-50 pt-3">
+                            <span class="text-xl font-bold text-pink-500">฿${p.price}</span>
+                            <button onclick="addCart('${p.id}')" ${p.stockCount === 0 ? 'disabled' : ''} 
+                                class="bg-gray-900 text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-purple-600 transition disabled:bg-gray-200 shadow-sm">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
@@ -355,297 +370,191 @@
             `).join('');
         }
 
-        function addToCart(id) {
-            const product = appState.products.find(p => p.id == id);
-            if(product) {
-                appState.cart.push(product);
-                updateCartBadge();
-                Swal.fire({
-                    toast: true, position: 'top', icon: 'success', title: 'เพิ่มลงตระกร้าแล้ว',
-                    showConfirmButton: false, timer: 1500, timerProgressBar: true
-                });
-            }
+        function addCart(id) {
+            const p = appData.products.find(x => x.id == id);
+            // Check stock in cart vs available
+            const inCart = appData.cart.filter(x => x.id == id).length;
+            if(inCart >= p.stockCount) return Swal.fire({toast: true, position: 'top', icon: 'error', title: 'สต๊อกไม่พอ', showConfirmButton: false, timer: 1500});
+            
+            appData.cart.push(p);
+            updateBadge();
+            Swal.fire({toast: true, position: 'top', icon: 'success', title: 'เพิ่มลงตระกร้า', showConfirmButton: false, timer: 1000});
         }
 
-        function updateCartBadge() {
-            const badge = document.getElementById('cart-badge');
-            badge.innerText = appState.cart.length;
-            badge.style.display = appState.cart.length > 0 ? 'flex' : 'none';
+        function updateBadge() {
+            const b = document.getElementById('cart-badge');
+            b.innerText = appData.cart.length;
+            b.style.display = appData.cart.length > 0 ? 'flex' : 'none';
         }
 
         function showCart() {
-            if(appState.cart.length === 0) {
-                Swal.fire({icon: 'info', title: 'ตระกร้าว่างเปล่า', text: 'เลือกสินค้าที่ต้องการก่อนนะคะ', confirmButtonColor: '#a855f7'});
-                return;
-            }
-            renderCartItems();
-            showPage('page-cart');
+            if(appData.cart.length === 0) return Swal.fire({icon: 'info', title: 'ตระกร้าว่าง', confirmButtonColor: '#a855f7'});
+            renderCart(); showPage('page-cart');
         }
 
-        function renderCartItems() {
-            const container = document.getElementById('cart-items');
+        function renderCart() {
             let total = 0;
-            container.innerHTML = appState.cart.map((item, index) => {
+            document.getElementById('cart-items').innerHTML = appData.cart.map((item, idx) => {
                 total += parseFloat(item.price);
                 return `
-                <div class="flex justify-between items-center py-3 ${index !== 0 ? 'border-t border-gray-100' : ''}">
-                    <div>
-                        <h4 class="font-semibold text-sm text-gray-800">${item.name}</h4>
-                        <p class="text-xs text-gray-500">${item.duration}</p>
-                    </div>
+                <div class="flex justify-between items-center py-2 ${idx !== 0 ? 'border-t border-gray-50' : ''}">
+                    <div><h4 class="font-bold text-sm text-gray-800">${item.name}</h4><p class="text-[10px] text-gray-400">${item.duration}</p></div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-sm">฿${item.price}</span>
-                        <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                        <button onclick="delCart(${idx})" class="text-red-400 bg-red-50 w-7 h-7 rounded-full text-xs"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                 </div>`;
             }).join('');
             document.getElementById('cart-total').innerText = `฿${total.toFixed(2)}`;
         }
 
-        function removeFromCart(index) {
-            appState.cart.splice(index, 1);
-            updateCartBadge();
-            if(appState.cart.length === 0) goHome();
-            else renderCartItems();
+        function delCart(idx) {
+            appData.cart.splice(idx, 1); updateBadge();
+            if(appData.cart.length === 0) goHome(); else renderCart();
         }
 
-        // ---------------- Checkout Logic ----------------
-        let slipBase64 = "";
-        
-        function previewSlip(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        // Compress Image before sending
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
-                        const MAX_WIDTH = 600;
-                        let width = img.width; let height = img.height;
-                        if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
-                        canvas.width = width; canvas.height = height;
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        slipBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                        document.getElementById('slip-preview').classList.add('hidden');
-                        const slipImg = document.getElementById('slip-image');
-                        slipImg.src = slipBase64;
-                        slipImg.classList.remove('hidden');
-                    }
-                    img.src = e.target.result;
+        // ---------------- Checkout ----------------
+        function handleSlip(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+                    let w = img.width, h = img.height; const max = 600;
+                    if(w > max) { h = Math.round(h * max / w); w = max; }
+                    canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                    slipBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    document.getElementById('slip-preview').classList.add('hidden');
+                    document.getElementById('slip-image').src = slipBase64;
+                    document.getElementById('slip-image').classList.remove('hidden');
                 }
-                reader.readAsDataURL(file);
-            }
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
-        async function confirmCheckout() {
+        async function processCheckout() {
             const email = document.getElementById('checkout-email').value;
-            const btn = document.getElementById('btn-confirm');
+            if(!email.includes('@')) return Swal.fire({icon: 'warning', text: 'กรอกอีเมลให้ถูกต้อง', confirmButtonColor: '#a855f7'});
+            if(!slipBase64) return Swal.fire({icon: 'warning', text: 'แนบสลิปด้วยนะคะ', confirmButtonColor: '#a855f7'});
+
+            loading(true);
+            const total = appData.cart.reduce((s, i) => s + parseFloat(i.price), 0);
             
-            if(!email || !email.includes('@')) return Swal.fire({icon: 'warning', text: 'กรุณากรอกอีเมลให้ถูกต้อง', confirmButtonColor: '#a855f7'});
-            if(!slipBase64) return Swal.fire({icon: 'warning', text: 'กรุณาแนบสลิปโอนเงิน', confirmButtonColor: '#a855f7'});
+            const res = await api("checkout", { cart: appData.cart, email, total, slipBase64 });
+            loading(false);
 
-            btn.disabled = true;
-            showLoading(true);
-
-            let total = appState.cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
-            
-            const reqData = {
-                cart: appState.cart,
-                email: email,
-                total: total,
-                slipBase64: slipBase64
-            };
-
-            const res = await fetchGAS("checkout", reqData);
-            
-            showLoading(false);
-            btn.disabled = false;
-
-            if (res.status === "success") {
-                buildReceipt(res.orderId, email, total);
-                appState.cart = [];
-                updateCartBadge();
-                slipBase64 = "";
+            if(res.status === "success") {
+                buildReceipt(res.orderId, email, total, res.deliveredAccounts);
+                appData.cart = []; updateBadge(); slipBase64 = "";
                 document.getElementById('checkout-email').value = "";
                 document.getElementById('slip-image').classList.add('hidden');
                 document.getElementById('slip-preview').classList.remove('hidden');
-                document.getElementById('checkout-slip').value = "";
                 showPage('page-receipt');
+                loadData(); // Reload to update stock UI
             } else {
-                Swal.fire({icon: 'error', title: 'เกิดข้อผิดพลาด', text: res.message, confirmButtonColor: '#a855f7'});
+                Swal.fire({icon: 'error', text: res.message});
             }
         }
 
-        // ---------------- Receipt Generation ----------------
-        function buildReceipt(orderId, email, total) {
-            const dateStr = new Date().toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' });
-            document.getElementById('r-date').innerText = dateStr;
-            document.getElementById('r-order').innerText = orderId;
+        function buildReceipt(id, email, total, items) {
+            document.getElementById('r-date').innerText = new Date().toLocaleString('th-TH');
+            document.getElementById('r-order').innerText = id;
             document.getElementById('r-email').innerText = email;
-            
-            document.getElementById('r-items').innerHTML = appState.cart.map(i => 
-                `<div class="flex justify-between"><span>${i.name} (${i.duration})</span><span>฿${i.price}</span></div>`
-            ).join('');
-            
             document.getElementById('r-total').innerText = `฿${total.toFixed(2)}`;
+            document.getElementById('r-delivered').innerHTML = items.map(i => `<div>${i}</div>`).join('');
         }
 
-        function saveReceipt() {
-            const card = document.getElementById('receipt-card');
-            html2canvas(card, { scale: 2, backgroundColor: null }).then(canvas => {
+        function downloadReceipt() {
+            html2canvas(document.getElementById('receipt-card'), {scale: 2}).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `Receipt_${document.getElementById('r-order').innerText}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+                link.download = `SNI_${document.getElementById('r-order').innerText}.png`;
+                link.href = canvas.toDataURL(); link.click();
             });
         }
 
-        // ---------------- Admin Logic ----------------
-        function renderAdminTable() {
-            document.getElementById('admin-popup-msg').value = appState.popup.message;
-            document.getElementById('admin-popup-img').value = appState.popup.image;
+        // ---------------- Admin ----------------
+        function renderAdmin() {
+            document.getElementById('ad-pop-msg').value = appData.popup.message || "";
+            document.getElementById('ad-pop-img').value = appData.popup.image || "";
 
-            const tbody = document.getElementById('admin-product-table');
-            tbody.innerHTML = appState.products.map(p => `
-                <tr class="border-b">
-                    <td class="px-4 py-3 font-medium text-gray-900">${p.name}</td>
-                    <td class="px-4 py-3">${p.duration}</td>
-                    <td class="px-4 py-3">฿${p.price}</td>
-                    <td class="px-4 py-3 text-right">
-                        <button onclick="adminEdit('${p.id}')" class="text-blue-500 mr-2"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="adminDelete('${p.id}')" class="text-red-500"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                </tr>
+            // Prod Select in Stock
+            const sel = document.getElementById('ad-st-pdid');
+            sel.innerHTML = '<option value="">-- เลือกสินค้า --</option>' + appData.products.map(p => `<option value="${p.id}">${p.name} (${p.duration})</option>`).join('');
+
+            // Tables
+            document.getElementById('ad-tb-prod').innerHTML = appData.products.map(p => `
+                <tr class="hover:bg-gray-50"><td class="px-4 py-2">${p.name}</td><td class="px-4 py-2">${p.duration}</td><td class="px-4 py-2">฿${p.price}</td>
+                <td class="px-4 py-2">${p.stockCount}</td>
+                <td class="px-4 py-2 text-right"><button onclick="editP('${p.id}')" class="text-blue-500 mr-2"><i class="fa-solid fa-pen"></i></button><button onclick="delP('${p.id}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>
             `).join('');
+
+            document.getElementById('ad-tb-stock').innerHTML = appData.stocks.map(s => {
+                const p = appData.products.find(x => x.id == s.productId);
+                return `
+                <tr class="hover:bg-gray-50"><td class="px-4 py-2 text-xs">${p ? p.name : 'Unknown'}</td><td class="px-4 py-2 text-[10px] text-gray-500">${s.accountData}</td>
+                <td class="px-4 py-2 text-xs ${s.status==='Available'?'text-green-500':'text-red-500'}">${s.status}</td>
+                <td class="px-4 py-2 text-right"><button onclick="editS('${s.id}')" class="text-blue-500 mr-2"><i class="fa-solid fa-pen"></i></button><button onclick="delS('${s.id}')" class="text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>
+            `}).join('');
         }
 
-        function adminClearForm() {
-            document.getElementById('admin-prod-id').value = "";
-            document.getElementById('admin-prod-name').value = "";
-            document.getElementById('admin-prod-dur').value = "";
-            document.getElementById('admin-prod-price').value = "";
-            document.getElementById('admin-prod-detail').value = "";
-        }
-
-        function adminEdit(id) {
-            const p = appState.products.find(x => x.id == id);
-            if(p) {
-                document.getElementById('admin-prod-id').value = p.id;
-                document.getElementById('admin-prod-name').value = p.name;
-                document.getElementById('admin-prod-dur').value = p.duration;
-                document.getElementById('admin-prod-price').value = p.price;
-                document.getElementById('admin-prod-detail').value = p.details;
-                window.scrollTo(0,0);
-            }
-        }
-
-        async function adminSaveProduct() {
-            const data = {
-                id: document.getElementById('admin-prod-id').value,
-                name: document.getElementById('admin-prod-name').value,
-                duration: document.getElementById('admin-prod-dur').value,
-                price: document.getElementById('admin-prod-price').value,
-                details: document.getElementById('admin-prod-detail').value
-            };
+        // Admin Prod Actions
+        function clearProdForm() { ['id','name','dur','price','det'].forEach(x => document.getElementById(`ad-pd-${x}`).value = ''); }
+        function editP(id) { const p = appData.products.find(x => x.id == id); if(p){ document.getElementById('ad-pd-id').value=p.id; document.getElementById('ad-pd-name').value=p.name; document.getElementById('ad-pd-dur').value=p.duration; document.getElementById('ad-pd-price').value=p.price; document.getElementById('ad-pd-det').value=p.details; } }
+        async function saveProduct() {
+            const data = { id: document.getElementById('ad-pd-id').value, name: document.getElementById('ad-pd-name').value, duration: document.getElementById('ad-pd-dur').value, price: document.getElementById('ad-pd-price').value, details: document.getElementById('ad-pd-det').value };
             if(!data.name || !data.price) return alert("กรอกข้อมูลให้ครบ");
-            
-            showLoading(true);
-            const res = await fetchGAS("adminSaveProduct", data);
-            if(res.status === "success") {
-                await fetchData();
-                renderAdminTable();
-                adminClearForm();
-            }
-            showLoading(false);
+            loading(true); await api("adminSaveProduct", data); clearProdForm(); await loadData(); renderAdmin(); loading(false);
+        }
+        async function delP(id) { if(confirm("ลบสินค้านี้?")) { loading(true); await api("adminDeleteProduct", {id}); await loadData(); renderAdmin(); loading(false); } }
+
+        // Admin Stock Actions
+        function clearStockForm() { ['id','pdid','data'].forEach(x => document.getElementById(`ad-st-${x}`).value = ''); document.getElementById('ad-st-stat').value='Available'; }
+        function editS(id) { const s = appData.stocks.find(x => x.id == id); if(s){ document.getElementById('ad-st-id').value=s.id; document.getElementById('ad-st-pdid').value=s.productId; document.getElementById('ad-st-data').value=s.accountData; document.getElementById('ad-st-stat').value=s.status; } }
+        async function saveStock() {
+            const data = { id: document.getElementById('ad-st-id').value, productId: document.getElementById('ad-st-pdid').value, accountData: document.getElementById('ad-st-data').value, status: document.getElementById('ad-st-stat').value };
+            if(!data.productId || !data.accountData) return alert("กรอกข้อมูลให้ครบ");
+            loading(true); await api("adminSaveStock", data); clearStockForm(); await loadData(); renderAdmin(); loading(false);
+        }
+        async function delS(id) { if(confirm("ลบสต๊อกนี้?")) { loading(true); await api("adminDeleteStock", {id}); await loadData(); renderAdmin(); loading(false); } }
+
+        // Admin Popup
+        async function savePopup() {
+            loading(true); await api("adminSavePopup", { message: document.getElementById('ad-pop-msg').value, image: document.getElementById('ad-pop-img').value });
+            alert("บันทึก Popup แล้ว"); loading(false);
         }
 
-        async function adminDelete(id) {
-            if(!confirm("แน่ใจหรือไม่ที่จะลบสินค้าชิ้นนี้?")) return;
-            showLoading(true);
-            const res = await fetchGAS("adminDeleteProduct", {id: id});
-            if(res.status === "success") {
-                await fetchData();
-                renderAdminTable();
-            }
-            showLoading(false);
-        }
-
-        async function adminSavePopup() {
-            const data = {
-                message: document.getElementById('admin-popup-msg').value,
-                image: document.getElementById('admin-popup-img').value
-            };
-            showLoading(true);
-            const res = await fetchGAS("adminSavePopup", data);
-            if(res.status === "success") alert("บันทึก Popup แล้ว");
-            showLoading(false);
-        }
-
-        // ---------------- App System Logic ----------------
-        
-        // PWA Manifest Generation (No external file needed)
-        function generatePWAManifest() {
+        // ---------------- PWA & Browser Logic ----------------
+        function setupPWA() {
             const manifest = {
-                name: "ออมสินมหาเฮง",
-                short_name: "ออมสินมหาเฮง",
-                start_url: ".",
-                display: "standalone",
-                background_color: "#ffffff",
-                theme_color: "#ffffff",
-                icons: [{
-                    src: "https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png",
-                    sizes: "192x192 512x512",
-                    type: "image/png"
-                }]
+                name: "SNI sindy", short_name: "SNI sindy", start_url: ".", display: "standalone",
+                background_color: "#fafafa", theme_color: "#ffffff",
+                icons: [{ src: "https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png", sizes: "192x192", type: "image/png" }]
             };
-            const stringManifest = JSON.stringify(manifest);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestURL;
+            const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(blob);
             document.head.appendChild(link);
         }
 
-        // Detect In-App Browser & PWA Prompt
-        function checkBrowserAndPWA() {
-            const ua = navigator.userAgent || navigator.vendor || window.opera;
-            const isLine = (ua.indexOf("Line") > -1);
-            const isFB = (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Instagram") > -1);
-            
-            // Checking if running as Standalone (PWA)
+        function checkBrowser() {
+            const ua = navigator.userAgent;
+            const inApp = /Line|FBAN|FBAV|Instagram/i.test(ua);
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
 
-            if (isLine || isFB) {
+            if (inApp) {
                 Swal.fire({
-                    icon: 'warning',
-                    title: 'เปิดในเบราว์เซอร์ปกติ',
-                    html: 'เพื่อให้สามารถบันทึกเป็นแอปได้<br>กรุณากดปุ่มจุดไข่ปลาด้านขวาบน แล้วเลือก <b>"เปิดในเบราว์เซอร์ (Safari/Chrome)"</b>',
-                    confirmButtonColor: '#a855f7',
-                    confirmButtonText: 'เข้าใจแล้ว',
-                    allowOutsideClick: false
+                    icon: 'warning', title: 'โปรดเปิดในเบราว์เซอร์ปกติ',
+                    html: 'เพื่อให้ใช้งานและโหลดแอปได้สมบูรณ์<br>กรุณากดมุมขวาบน เลือก <b>"เปิดใน Safari/Chrome"</b>',
+                    confirmButtonColor: '#a855f7', allowOutsideClick: false
                 });
             } else if (!isStandalone) {
-                // Show Add to Home Screen Hint
-                const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
                 setTimeout(() => {
                     if(!sessionStorage.getItem('pwaPrompt')) {
                         Swal.fire({
-                            position: 'bottom',
-                            html: `
-                                <div class="text-sm">
-                                    <div class="font-bold mb-1">ติดตั้งแอปของเรา!</div>
-                                    แตะไอคอน ${isIOS ? '<i class="fa-solid fa-arrow-up-from-bracket mx-1"></i> (แชร์)' : '<i class="fa-solid fa-ellipsis-vertical mx-1"></i> (เมนู)'} <br>
-                                    แล้วเลือก <b>"เพิ่มลงในหน้าจอโฮม"</b>
-                                </div>
-                            `,
-                            showConfirmButton: false,
-                            showCloseButton: true,
-                            toast: true,
-                            timer: 10000
+                            position: 'bottom', html: `<b>ติดตั้งแอปร้านเรา!</b><br>แตะไอคอนแชร์/เมนู แล้วเลือก "เพิ่มลงในหน้าจอโฮม"`,
+                            showConfirmButton: false, showCloseButton: true, toast: true, timer: 10000
                         });
                         sessionStorage.setItem('pwaPrompt', 'true');
                     }
