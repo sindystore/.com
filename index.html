@@ -248,7 +248,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">อีเมลสำหรับรับสินค้า (สำคัญ)</label>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">อีเมลสำหรับรับสินค้า (สำคัญ ระบบจะส่งข้อมูลไปที่นี่)</label>
                     <input type="email" id="customerEmail" placeholder="example@gmail.com" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:border-pink-500 text-sm">
                 </div>
 
@@ -304,7 +304,7 @@
                     <span id="recTotal" class="text-pink-600 text-base">0.00 บาท</span>
                 </div>
                 <div class="text-center pt-2 text-[10px] text-gray-400">
-                    สถานะ: ชำระเงินสำเร็จ (ตรวจสอบสลิปอัตโนมัติแล้ว) ขอบคุณที่ใช้บริการ
+                    สถานะ: ชำระเงินสำเร็จ (ส่งข้อมูลเข้าอีเมลและตรวจสอบสลิปแล้ว)
                 </div>
             </div>
 
@@ -367,7 +367,7 @@
         </div>
     </div>
 
-    <!-- Product Detail / Admin Edit Modal (Added Reseller Price field) -->
+    <!-- Product Detail / Admin Edit Modal -->
     <div id="productModal" class="fixed inset-0 bg-black/50 z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
@@ -432,7 +432,7 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <div id="historyListContainer" class="flex-grow overflow-y-auto space-y-3 pr-1 divide-y divide-gray-50">
+            <div id="historyListContainer" class="flex-grow overflow-y-auto space-y-4 pr-1 divide-y divide-gray-100">
                 <!-- History items -->
             </div>
         </div>
@@ -637,11 +637,20 @@
             document.getElementById('cartModal').classList.add('hidden');
         }
 
+        // MANDATORY LOGIN CHECK BEFORE PROCEEDING TO CHECKOUT
         function proceedToCheckout() {
+            if (!currentUser) {
+                alert("กรุณาเข้าสู่ระบบก่อนดำเนินการชำระเงิน");
+                closeCartModal();
+                openLoginModal();
+                return;
+            }
             if (cart.length === 0) return;
             closeCartModal();
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             document.getElementById('checkoutDisplayTotal').innerText = `ยอดชำระ: ${total.toLocaleString()} บาท`;
+            
+            // Auto fill email if logged in user has email info or leave blank
             document.getElementById('checkoutModal').classList.remove('hidden');
         }
 
@@ -666,6 +675,12 @@
         }
 
         async function submitOrder() {
+            if (!currentUser) {
+                alert("กรุณาเข้าสู่ระบบก่อนทำการสั่งซื้อ");
+                openLoginModal();
+                return;
+            }
+
             const email = document.getElementById('customerEmail').value;
             if (!email) {
                 alert("กรุณากรอกอีเมลสำหรับรับสินค้า");
@@ -678,7 +693,7 @@
 
             const btn = document.getElementById('confirmOrderBtn');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> กำลังตรวจสอบสลิปและส่งสินค้า...`;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-2"></i> กำลังตรวจสอบสลิปและส่งสินค้าทางเมล...`;
 
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 
@@ -687,7 +702,7 @@
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'checkout',
-                        username: currentUser ? currentUser.username : 'guest',
+                        username: currentUser.username,
                         items: cart,
                         total: total,
                         email: email,
@@ -826,7 +841,7 @@
             } catch (err) {
                 if (u === 'admin' && p === 'admin123') {
                     currentUser = { username: 'admin', name: 'ผู้ดูแลระบบ', role: 'admin', balance: 0 };
-                } else if (u === 'reseller' || u === 'reseller1') {
+                } else if (u === 'reseller1') {
                     currentUser = { username: 'reseller1', name: 'ตัวแทนจำหน่าย A', role: 'reseller', balance: 500 };
                 } else {
                     currentUser = { username: u, name: 'ลูกค้าทั่วไป', role: 'customer', balance: 100 };
@@ -1004,7 +1019,14 @@
             }
         }
 
+        // HISTORY MODAL WITH DETAILED ITEMS AND DELIVERED STOCK DISPLAY
         async function openHistoryModal() {
+            if (!currentUser) {
+                alert("กรุณาเข้าสู่ระบบเพื่อดูประวัติการสั่งซื้อ");
+                openLoginModal();
+                return;
+            }
+
             const container = document.getElementById('historyListContainer');
             container.innerHTML = `<div class="text-center py-12 text-gray-400 text-sm"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 text-pink-400"></i><p>กำลังโหลดประวัติ...</p></div>`;
             document.getElementById('historyModal').classList.remove('hidden');
@@ -1014,31 +1036,45 @@
                     method: 'POST',
                     body: JSON.stringify({
                         action: 'getHistory',
-                        username: currentUser ? currentUser.username : 'guest',
-                        role: currentUser ? currentUser.role : 'customer'
+                        username: currentUser.username,
+                        role: currentUser.role
                     })
                 });
                 const data = await res.json();
                 if (data.status === 'success' && data.history.length > 0) {
                     container.innerHTML = '';
                     data.history.forEach(h => {
-                        let itemsText = h.items;
+                        let itemsHtml = "";
                         try {
-                            const parsed = JSON.parse(h.items);
-                            itemsText = parsed.map(i => `${i.name} (${i.duration}) x ${i.qty}`).join(', ');
+                            const parsedItems = JSON.parse(h.items);
+                            itemsHtml = parsedItems.map(i => `<div class="text-xs text-gray-700 font-medium"><i class="fa-solid fa-box text-pink-500 mr-1"></i> ${i.name} (${i.duration}) x ${i.qty} (${(i.price * i.qty).toLocaleString()} บาท)</div>`).join('');
+                        } catch(e) { itemsHtml = `<div class="text-xs text-gray-600">${h.items}</div>`; }
+
+                        let stockHtml = "";
+                        try {
+                            const parsedStock = JSON.parse(h.deliveredStock);
+                            if (parsedStock && parsedStock.length > 0) {
+                                stockHtml = parsedStock.map(ds => {
+                                    const assignedStr = ds.assigned && ds.assigned.length > 0 ? ds.assigned.join(', ') : 'ส่งทางเมลแล้ว';
+                                    return `<div class="text-[11px] bg-pink-50 text-pink-700 p-2 rounded-xl mt-1 font-mono"><strong>[ข้อมูลสินค้า]:</strong> ${assignedStr}</div>`;
+                                }).join('');
+                            }
                         } catch(e) {}
 
                         const div = document.createElement('div');
-                        div.className = "py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0";
+                        div.className = "pt-3 pb-2 space-y-2";
                         div.innerHTML = `
-                            <div>
-                                <span class="text-xs font-bold text-pink-600">${h.orderId}</span>
-                                <p class="text-sm font-medium text-gray-800">${itemsText}</p>
-                                <span class="text-[11px] text-gray-400">${h.date} | อีเมล: ${h.email}</span>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-pink-600"><i class="fa-solid fa-receipt mr-1"></i> ${h.orderId}</span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-medium">${h.status}</span>
                             </div>
-                            <div class="text-right">
-                                <span class="text-sm font-bold text-gray-800">${Number(h.total).toLocaleString()} บาท</span>
-                                <br><span class="text-[10px] bg-emerald-100 text-emerald-600 px-2 py-0.5 rounded-full font-medium">${h.status}</span>
+                            <div class="space-y-1">
+                                ${itemsHtml}
+                                ${stockHtml}
+                            </div>
+                            <div class="flex justify-between items-center text-[11px] text-gray-400 pt-1">
+                                <span>วันที่: ${h.date} | ผู้ซื้อ: ${h.username}</span>
+                                <span class="font-bold text-gray-700">รวม: ${Number(h.total).toLocaleString()} บาท</span>
                             </div>
                         `;
                         container.appendChild(div);
