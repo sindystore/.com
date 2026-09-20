@@ -40,8 +40,8 @@
             <h3 class="text-xl font-bold mb-2 text-pink-600">คำเตือนการใช้งานเบราว์เซอร์</h3>
             <p class="text-gray-600 text-sm mb-4">คุณกำลังเปิดผ่านแอปพลิเคชันอื่น กรุณากดเปิดใน Safari หรือ Google Chrome เพื่อประสบการณ์การใช้งานที่สมบูรณ์และสามารถเพิ่มเว็บลงหน้าจอโฮมได้</p>
             <div class="bg-pink-50 p-4 rounded-2xl text-left text-xs text-gray-700 space-y-2 mb-6">
-                <p><i class="fa-solid fa-circle-chevron-right text-pink-500 mr-2"></i><strong>วิธีเปิดใน Safari / Chrome:</strong> กดปุ่มจุดสามจุด (...) หรือแชร์ที่มุมขวาบน แล้วเลือก "เปิดในเบราว์เซอร์หลัก"</p>
-                <p><i class="fa-solid fa-circle-chevron-right text-pink-500 mr-2"></i><strong>วิธีเพิ่มหน้าจอโฮม:</strong> กดปุ่มแชร์ใน Safari เลือก "เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</p>
+                <p><i class="fa-solid fa-circle-chevron-right text-pink-500 mr-2"></i><strong>วิธีเปิดใน Safari / Chrome:</strong> กดปุ่มจุดสามจุด หรือแชร์ที่มุมขวาบน แล้วเลือกเปิดในเบราว์เซอร์หลัก</p>
+                <p><i class="fa-solid fa-circle-chevron-right text-pink-500 mr-2"></i><strong>วิธีเพิ่มหน้าจอโฮม:</strong> กดปุ่มแชร์ใน Safari เลือก เพิ่มไปยังหน้าจอโฮม (Add to Home Screen)</p>
             </div>
             <button onclick="closeBrowserWarning()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 rounded-2xl transition shadow-md">
                 รับทราบและดำเนินการต่อ
@@ -107,7 +107,7 @@
         
         <!-- Shop Tab -->
         <div id="tabShop" class="space-y-6">
-            <!-- Banner Slider / Hero -->
+            <!-- Banner Hero -->
             <div class="bg-gradient-to-r from-pink-500 to-purple-500 rounded-3xl p-6 md:p-10 text-white shadow-lg relative overflow-hidden flex flex-col md:flex-row items-center justify-between">
                 <div class="relative z-10 max-w-lg mb-6 md:mb-0">
                     <span class="bg-white/20 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">โปรโมชั่นพิเศษประจำเดือน</span>
@@ -125,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- Admin Action Bar (Visible only for admin) -->
+            <!-- Admin Action Bar -->
             <div id="adminBar" class="hidden flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
                 <div class="flex items-center space-x-2 text-pink-600 font-semibold">
                     <i class="fa-solid fa-shield-halved"></i>
@@ -136,7 +136,7 @@
                 </button>
             </div>
 
-            <!-- Stats Bar (Visible for Admin) -->
+            <!-- Stats Bar -->
             <div id="statsBar" class="hidden grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-pink-100 flex items-center space-x-4">
                     <div class="w-12 h-12 bg-pink-100 text-pink-500 rounded-2xl flex items-center justify-center text-xl">
@@ -210,7 +210,7 @@
             </div>
             
             <div id="cartItemsList" class="flex-grow overflow-y-auto space-y-3 pr-1 divide-y divide-gray-50">
-                <!-- Cart items injected here -->
+                <!-- Cart items -->
             </div>
 
             <div class="pt-4 border-t border-gray-100 mt-4 space-y-3">
@@ -367,7 +367,7 @@
         </div>
     </div>
 
-    <!-- Product Detail / Admin Edit Modal -->
+    <!-- Product Detail / Admin Edit Modal (Updated with Unlimited Stock Textarea) -->
     <div id="productModal" class="fixed inset-0 bg-black/50 z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
@@ -397,8 +397,9 @@
                     <input type="text" id="prodImage" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">จำนวนสต็อก</label>
-                    <input type="number" id="prodStock" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">สต็อกสินค้า (1 บรรทัด = 1 ชิ้น / เพิ่มได้ไม่จำกัด)</label>
+                    <textarea id="prodStockList" rows="5" placeholder="กรอกหรือวางข้อมูลสต็อกทีละบรรทัด เช่น&#10;user1@gmail.com:pass1&#10;user2@gmail.com:pass2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-mono"></textarea>
+                    <span class="text-[11px] text-gray-400">ระบบจะนับจำนวนสต็อกให้อัตโนมัติตามจำนวนบรรทัดที่กรอก</span>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">รายละเอียดสินค้า</label>
@@ -446,7 +447,6 @@
         let selectedSlipMimeType = null;
         let currentOrderData = null;
 
-        // Check in-app browser on load
         window.addEventListener('DOMContentLoaded', () => {
             checkInAppBrowser();
             fetchProducts();
@@ -469,7 +469,6 @@
             document.getElementById('welcomeModal').classList.add('hidden');
         }
 
-        // Fetch Products from GAS API
         async function fetchProducts() {
             try {
                 const response = await fetch(GAS_URL, {
@@ -484,10 +483,9 @@
                 }
             } catch (error) {
                 console.error("Error fetching products:", error);
-                // Fallback demo data if URL not set yet
                 products = [
-                    { id: 'P001', name: 'Netflix Premium 4K', duration: '1 Month', price: 150, description: 'Account 4K Ultra HD ดูได้จอส่วนตัว ไม่จำกัดอุปกรณ์', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stock: 10 },
-                    { id: 'P002', name: 'Youtube Premium', duration: '1 Year', price: 350, description: 'รายปี ดูเพลิดเพลินไม่มีโฆษณาคั่น พร้อมฟังเพลงเพลินๆ', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stock: 25 }
+                    { id: 'P001', name: 'Netflix Premium 4K', duration: '1 Month', price: 150, description: 'Account 4K Ultra HD ดูได้จอส่วนตัว ไม่จำกัดอุปกรณ์', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stockList: 'net1@gmail.com:pass1\nnet2@gmail.com:pass2', stock: 2 },
+                    { id: 'P002', name: 'Youtube Premium', duration: '1 Year', price: 350, description: 'รายปี ดูเพลิดเพลินไม่มีโฆษณาคั่น พร้อมฟังเพลงเพลินๆ', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stockList: 'yt1@gmail.com:pass1', stock: 1 }
                 ];
                 renderProducts();
                 document.getElementById('productCount').innerText = `ทั้งหมด ${products.length} รายการ`;
@@ -513,12 +511,12 @@
                         <div>
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-xl font-bold text-pink-600">${Number(p.price).toLocaleString()} บาท</span>
-                                <span class="text-xs text-gray-400 font-medium">เหลือ ${p.stock} ชิ้น</span>
+                                <span class="text-xs ${p.stock > 0 ? 'text-emerald-600' : 'text-red-500'} font-medium">เหลือ ${p.stock} ชิ้น</span>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
-                                <button onclick="addToCart('${p.id}')" class="bg-pink-500 hover:bg-pink-600 text-white py-2.5 rounded-xl font-medium text-xs transition shadow-sm flex items-center justify-center space-x-1">
+                                <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="${p.stock <= 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-pink-500 hover:bg-pink-600'} text-white py-2.5 rounded-xl font-medium text-xs transition shadow-sm flex items-center justify-center space-x-1">
                                     <i class="fa-solid fa-cart-plus"></i>
-                                    <span>ใส่ตะกร้า</span>
+                                    <span>${p.stock > 0 ? 'ใส่ตะกร้า' : 'สินค้าหมด'}</span>
                                 </button>
                                 <button onclick="openProductDetail('${p.id}')" class="bg-pink-50 text-pink-600 hover:bg-pink-100 py-2.5 rounded-xl font-medium text-xs transition flex items-center justify-center space-x-1">
                                     <i class="fa-solid fa-circle-info"></i>
@@ -538,11 +536,17 @@
             });
         }
 
-        // Cart Management
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
-            if (!product) return;
+            if (!product || product.stock <= 0) return;
             const existing = cart.find(item => item.id === productId);
+            const currentQtyInCart = existing ? existing.qty : 0;
+            
+            if (currentQtyInCart + 1 > product.stock) {
+                alert("จำนวนในตะกร้าเกินสต็อกที่มีอยู่");
+                return;
+            }
+
             if (existing) {
                 existing.qty += 1;
             } else {
@@ -595,8 +599,15 @@
         }
 
         function changeQty(index, delta) {
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) {
+            const item = cart[index];
+            const product = products.find(p => p.id === item.id);
+            const newQty = item.qty + delta;
+            if (newQty > product.stock) {
+                alert("จำนวนเกินสต็อกที่มีอยู่");
+                return;
+            }
+            item.qty = newQty;
+            if (item.qty <= 0) {
                 cart.splice(index, 1);
             }
             updateCartBadge();
@@ -625,7 +636,6 @@
             document.getElementById('checkoutModal').classList.add('hidden');
         }
 
-        // Slip Handling
         function handleSlipSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -642,7 +652,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Anti-Double-Click Submit Order
         async function submitOrder() {
             const email = document.getElementById('customerEmail').value;
             if (!email) {
@@ -686,12 +695,12 @@
                     updateCartBadge();
                     closeCheckoutModal();
                     openReceiptModal();
+                    fetchProducts();
                 } else {
                     alert("เกิดข้อผิดพลาด: " + result.message);
                 }
             } catch (err) {
                 console.error(err);
-                // Demo success fallback
                 currentOrderData = {
                     orderId: "ORD-" + Math.floor(100000 + Math.random() * 900000),
                     date: new Date().toLocaleString(),
@@ -709,7 +718,6 @@
             }
         }
 
-        // Receipt Modal & PNG Download
         function openReceiptModal() {
             if (!currentOrderData) return;
             document.getElementById('recOrderId').innerText = currentOrderData.orderId;
@@ -745,14 +753,12 @@
             });
         }
 
-        // Product Detail View
         function openProductDetail(productId) {
             const p = products.find(item => item.id === productId);
             if (!p) return;
             alert(`รายละเอียดสินค้า:\n\nชื่อ: ${p.name}\nระยะเวลา: ${p.duration}\nราคา: ${p.price} บาท\nรายละเอียด: ${p.description}\nสต็อกคงเหลือ: ${p.stock} ชิ้น`);
         }
 
-        // Auth & Login / Register
         function openLoginModal() {
             document.getElementById('authModal').classList.remove('hidden');
         }
@@ -803,7 +809,6 @@
                     alert(data.message);
                 }
             } catch (err) {
-                // Demo fallback login
                 if (u === 'admin' && p === 'admin123') {
                     currentUser = { username: 'admin', name: 'ผู้ดูแลระบบ', role: 'admin', balance: 0 };
                 } else {
@@ -903,7 +908,6 @@
             }
         }
 
-        // Admin Product CRUD Modal
         function openProductModal() {
             document.getElementById('productModalTitle').innerText = "เพิ่มสินค้าใหม่";
             document.getElementById('prodId').value = "";
@@ -911,7 +915,7 @@
             document.getElementById('prodDuration').value = "";
             document.getElementById('prodPrice').value = "";
             document.getElementById('prodImage').value = "";
-            document.getElementById('prodStock').value = "";
+            document.getElementById('prodStockList').value = "";
             document.getElementById('prodDesc').value = "";
             document.getElementById('deleteProdBtn').classList.add('hidden');
             document.getElementById('productModal').classList.remove('hidden');
@@ -926,7 +930,7 @@
             document.getElementById('prodDuration').value = p.duration;
             document.getElementById('prodPrice').value = p.price;
             document.getElementById('prodImage').value = p.image;
-            document.getElementById('prodStock').value = p.stock;
+            document.getElementById('prodStockList').value = p.stockList || "";
             document.getElementById('prodDesc').value = p.description;
             document.getElementById('deleteProdBtn').classList.remove('hidden');
             document.getElementById('productModal').classList.remove('hidden');
@@ -944,7 +948,7 @@
                 duration: document.getElementById('prodDuration').value,
                 price: Number(document.getElementById('prodPrice').value),
                 image: document.getElementById('prodImage').value,
-                stock: Number(document.getElementById('prodStock').value),
+                stockList: document.getElementById('prodStockList').value,
                 description: document.getElementById('prodDesc').value
             };
 
@@ -980,7 +984,6 @@
             }
         }
 
-        // History Modal
         async function openHistoryModal() {
             const container = document.getElementById('historyListContainer');
             container.innerHTML = `<div class="text-center py-12 text-gray-400 text-sm"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 text-pink-400"></i><p>กำลังโหลดประวัติ...</p></div>`;
