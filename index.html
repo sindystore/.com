@@ -367,7 +367,7 @@
         </div>
     </div>
 
-    <!-- Product Detail / Admin Edit Modal (Updated with Unlimited Stock Textarea) -->
+    <!-- Product Detail / Admin Edit Modal (Added Reseller Price field) -->
     <div id="productModal" class="fixed inset-0 bg-black/50 z-40 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100">
@@ -388,9 +388,13 @@
                         <input type="text" id="prodDuration" placeholder="เช่น 1 เดือน" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">ราคา (บาท)</label>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">ราคาปกติ (บาท)</label>
                         <input type="number" id="prodPrice" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm">
                     </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-pink-600 mb-1">ราคาตัวแทนจำหน่าย (บาท)</label>
+                    <input type="number" id="prodResellerPrice" placeholder="ราคาพิเศษสำหรับตัวแทน" class="w-full px-4 py-3 bg-pink-50 border border-pink-200 rounded-2xl text-sm font-semibold text-pink-600">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">ลิงก์รูปภาพสินค้า</label>
@@ -398,8 +402,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">สต็อกสินค้า (1 บรรทัด = 1 ชิ้น / เพิ่มได้ไม่จำกัด)</label>
-                    <textarea id="prodStockList" rows="5" placeholder="กรอกหรือวางข้อมูลสต็อกทีละบรรทัด เช่น&#10;user1@gmail.com:pass1&#10;user2@gmail.com:pass2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-mono"></textarea>
-                    <span class="text-[11px] text-gray-400">ระบบจะนับจำนวนสต็อกให้อัตโนมัติตามจำนวนบรรทัดที่กรอก</span>
+                    <textarea id="prodStockList" rows="4" placeholder="user1@gmail.com:pass1&#10;user2@gmail.com:pass2" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-mono"></textarea>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-600 mb-1">รายละเอียดสินค้า</label>
@@ -484,8 +487,8 @@
             } catch (error) {
                 console.error("Error fetching products:", error);
                 products = [
-                    { id: 'P001', name: 'Netflix Premium 4K', duration: '1 Month', price: 150, description: 'Account 4K Ultra HD ดูได้จอส่วนตัว ไม่จำกัดอุปกรณ์', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stockList: 'net1@gmail.com:pass1\nnet2@gmail.com:pass2', stock: 2 },
-                    { id: 'P002', name: 'Youtube Premium', duration: '1 Year', price: 350, description: 'รายปี ดูเพลิดเพลินไม่มีโฆษณาคั่น พร้อมฟังเพลงเพลินๆ', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stockList: 'yt1@gmail.com:pass1', stock: 1 }
+                    { id: 'P001', name: 'Netflix Premium 4K', duration: '1 Month', price: 150, resellerPrice: 120, description: 'Account 4K Ultra HD ดูได้จอส่วนตัว ไม่จำกัดอุปกรณ์', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stockList: 'net1@gmail.com:pass1\nnet2@gmail.com:pass2', stock: 2 },
+                    { id: 'P002', name: 'Youtube Premium', duration: '1 Year', price: 350, resellerPrice: 290, description: 'รายปี ดูเพลิดเพลินไม่มีโฆษณาคั่น พร้อมฟังเพลงเพลินๆ', image: 'https://s.imgz.io/2026/07/15/DA0D2171-669F-4863-B0AD-A3084C2E881A787a7e4aae484696.png', stockList: 'yt1@gmail.com:pass1', stock: 1 }
                 ];
                 renderProducts();
                 document.getElementById('productCount').innerText = `ทั้งหมด ${products.length} รายการ`;
@@ -495,7 +498,10 @@
         function renderProducts() {
             const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
+            const isReseller = currentUser && (currentUser.role === 'reseller' || currentUser.role === 'admin');
+
             products.forEach(p => {
+                const displayPrice = isReseller ? Number(p.resellerPrice) : Number(p.price);
                 const card = document.createElement('div');
                 card.className = "laser-card";
                 card.innerHTML = `
@@ -504,13 +510,17 @@
                             <div class="relative mb-4 overflow-hidden rounded-2xl bg-pink-50/50 aspect-square flex items-center justify-center">
                                 <img src="${p.image}" class="w-28 h-28 object-contain rounded-xl" alt="${p.name}">
                                 <span class="absolute top-3 right-3 bg-pink-500 text-white text-[10px] px-2.5 py-1 rounded-full font-semibold shadow-sm">${p.duration}</span>
+                                ${isReseller ? `<span class="absolute bottom-3 left-3 bg-purple-500 text-white text-[10px] px-2.5 py-1 rounded-full font-semibold shadow-sm"><i class="fa-solid fa-tag mr-1"></i>ราคาส่งตัวแทน</span>` : ''}
                             </div>
                             <h4 class="font-bold text-lg text-gray-800 mb-1">${p.name}</h4>
                             <p class="text-xs text-gray-500 line-clamp-2 mb-3">${p.description}</p>
                         </div>
                         <div>
                             <div class="flex items-center justify-between mb-3">
-                                <span class="text-xl font-bold text-pink-600">${Number(p.price).toLocaleString()} บาท</span>
+                                <div>
+                                    <span class="text-xl font-bold ${isReseller ? 'text-purple-600' : 'text-pink-600'}">${displayPrice.toLocaleString()} บาท</span>
+                                    ${isReseller ? `<div class="text-[10px] text-gray-400 line-through">ปกติ ${Number(p.price).toLocaleString()} บาท</div>` : ''}
+                                </div>
                                 <span class="text-xs ${p.stock > 0 ? 'text-emerald-600' : 'text-red-500'} font-medium">เหลือ ${p.stock} ชิ้น</span>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
@@ -539,6 +549,9 @@
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             if (!product || product.stock <= 0) return;
+            const isReseller = currentUser && (currentUser.role === 'reseller' || currentUser.role === 'admin');
+            const activePrice = isReseller ? Number(product.resellerPrice) : Number(product.price);
+
             const existing = cart.find(item => item.id === productId);
             const currentQtyInCart = existing ? existing.qty : 0;
             
@@ -550,7 +563,7 @@
             if (existing) {
                 existing.qty += 1;
             } else {
-                cart.push({ ...product, qty: 1 });
+                cart.push({ ...product, price: activePrice, qty: 1 });
             }
             updateCartBadge();
             showNotification("เพิ่มสินค้าลงในตะกร้าแล้ว");
@@ -756,7 +769,9 @@
         function openProductDetail(productId) {
             const p = products.find(item => item.id === productId);
             if (!p) return;
-            alert(`รายละเอียดสินค้า:\n\nชื่อ: ${p.name}\nระยะเวลา: ${p.duration}\nราคา: ${p.price} บาท\nรายละเอียด: ${p.description}\nสต็อกคงเหลือ: ${p.stock} ชิ้น`);
+            const isReseller = currentUser && (currentUser.role === 'reseller' || currentUser.role === 'admin');
+            const priceToShow = isReseller ? p.resellerPrice : p.price;
+            alert(`รายละเอียดสินค้า:\n\nชื่อ: ${p.name}\nระยะเวลา: ${p.duration}\nราคา: ${priceToShow} บาท ${isReseller ? '(ราคาส่งตัวแทน)' : ''}\nรายละเอียด: ${p.description}\nสต็อกคงเหลือ: ${p.stock} ชิ้น`);
         }
 
         function openLoginModal() {
@@ -811,6 +826,8 @@
             } catch (err) {
                 if (u === 'admin' && p === 'admin123') {
                     currentUser = { username: 'admin', name: 'ผู้ดูแลระบบ', role: 'admin', balance: 0 };
+                } else if (u === 'reseller' || u === 'reseller1') {
+                    currentUser = { username: 'reseller1', name: 'ตัวแทนจำหน่าย A', role: 'reseller', balance: 500 };
                 } else {
                     currentUser = { username: u, name: 'ลูกค้าทั่วไป', role: 'customer', balance: 100 };
                 }
@@ -861,7 +878,7 @@
             if (currentUser) {
                 area.innerHTML = `
                     <div class="flex items-center space-x-2">
-                        <span class="text-xs font-semibold bg-pink-100 text-pink-600 px-3 py-1.5 rounded-xl">${currentUser.name} (${currentUser.role})</span>
+                        <span class="text-xs font-semibold ${currentUser.role === 'reseller' ? 'bg-purple-100 text-purple-600' : 'bg-pink-100 text-pink-600'} px-3 py-1.5 rounded-xl">${currentUser.name} (${currentUser.role})</span>
                         <button onclick="handleLogout()" class="text-gray-400 hover:text-red-500 p-1.5"><i class="fa-solid fa-right-from-bracket"></i></button>
                     </div>
                 `;
@@ -914,6 +931,7 @@
             document.getElementById('prodName').value = "";
             document.getElementById('prodDuration').value = "";
             document.getElementById('prodPrice').value = "";
+            document.getElementById('prodResellerPrice').value = "";
             document.getElementById('prodImage').value = "";
             document.getElementById('prodStockList').value = "";
             document.getElementById('prodDesc').value = "";
@@ -929,6 +947,7 @@
             document.getElementById('prodName').value = p.name;
             document.getElementById('prodDuration').value = p.duration;
             document.getElementById('prodPrice').value = p.price;
+            document.getElementById('prodResellerPrice').value = p.resellerPrice;
             document.getElementById('prodImage').value = p.image;
             document.getElementById('prodStockList').value = p.stockList || "";
             document.getElementById('prodDesc').value = p.description;
@@ -947,6 +966,7 @@
                 name: document.getElementById('prodName').value,
                 duration: document.getElementById('prodDuration').value,
                 price: Number(document.getElementById('prodPrice').value),
+                resellerPrice: Number(document.getElementById('prodResellerPrice').value) || Number(document.getElementById('prodPrice').value),
                 image: document.getElementById('prodImage').value,
                 stockList: document.getElementById('prodStockList').value,
                 description: document.getElementById('prodDesc').value
