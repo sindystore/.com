@@ -637,7 +637,6 @@
             document.getElementById('cartModal').classList.add('hidden');
         }
 
-        // MANDATORY LOGIN CHECK BEFORE PROCEEDING TO CHECKOUT
         function proceedToCheckout() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบก่อนดำเนินการชำระเงิน");
@@ -649,8 +648,6 @@
             closeCartModal();
             const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
             document.getElementById('checkoutDisplayTotal').innerText = `ยอดชำระ: ${total.toLocaleString()} บาท`;
-            
-            // Auto fill email if logged in user has email info or leave blank
             document.getElementById('checkoutModal').classList.remove('hidden');
         }
 
@@ -681,7 +678,7 @@
                 return;
             }
 
-            const email = document.getElementById('customerEmail').value;
+            const email = document.getElementById('customerEmail').value.trim();
             if (!email) {
                 alert("กรุณากรอกอีเมลสำหรับรับสินค้า");
                 return;
@@ -815,9 +812,10 @@
             }
         }
 
+        // TRIMMING USERNAME AND PASSWORD DURING LOGIN
         async function handleLogin() {
-            const u = document.getElementById('loginUser').value;
-            const p = document.getElementById('loginPass').value;
+            const u = document.getElementById('loginUser').value.trim();
+            const p = document.getElementById('loginPass').value.trim();
             if (!u || !p) {
                 alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                 return;
@@ -853,10 +851,11 @@
             }
         }
 
+        // TRIMMING USERNAME AND PASSWORD DURING REGISTER
         async function handleRegister() {
-            const name = document.getElementById('regName').value;
-            const u = document.getElementById('regUser').value;
-            const p = document.getElementById('regPass').value;
+            const name = document.getElementById('regName').value.trim();
+            const u = document.getElementById('regUser').value.trim();
+            const p = document.getElementById('regPass').value.trim();
             if (!name || !u || !p) {
                 alert("กรุณากรอกข้อมูลให้ครบถ้วน");
                 return;
@@ -871,6 +870,8 @@
                 if (data.status === 'success') {
                     alert("สมัครสมาชิกสำเร็จ กรุณาเข้าสู่ระบบ");
                     switchAuthTab('login');
+                    document.getElementById('loginUser').value = u;
+                    document.getElementById('loginPass').value = p;
                 } else {
                     alert(data.message);
                 }
@@ -1019,7 +1020,6 @@
             }
         }
 
-        // HISTORY MODAL WITH DETAILED ITEMS AND DELIVERED STOCK DISPLAY
         async function openHistoryModal() {
             if (!currentUser) {
                 alert("กรุณาเข้าสู่ระบบเพื่อดูประวัติการสั่งซื้อ");
